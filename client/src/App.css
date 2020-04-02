@@ -1,0 +1,106 @@
+html {
+  box-sizing: border-box;
+  font-size: 62.5%;
+}
+
+body {
+  background-color: #21242b;
+  font-family: "Staatliches";
+  color: #ffffff;
+  font-size: 3rem;
+}
+
+.App-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  background-color: #242529;
+  border-bottom: 2px solid #49515f;
+  padding: 0.5rem 1rem;
+}
+
+.header-title {
+  font-size: 2.5rem;
+}
+
+.header-userName {
+  font-size: 2.5rem;
+
+  right: 0;
+  top: 0;
+}
+
+.main {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  flex: 1;
+}
+
+.chatRoomList-container {
+  background-color: green;
+  width: 20rem;
+}
+
+.chatRoomList-content {
+  border: 2px solid black;
+  height: 100%;
+  background-color: orange;
+}
+
+.chatWindow-container {
+  background-color: red;
+  flex-grow: 1;
+}
+
+.chatWindow-content {
+  background-color: yellow;
+  height: 100%;
+  border: 2px solid black;
+}
+
+.userList-container {
+  background-color: blue;
+  width: 25rem;
+}
+
+.userList-content {
+  height: 100%;
+  background-color: red;
+  border: 2px solid black;
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 5rem;
+}
+/* default: #ffffff */
+
+/*
+  #242529; lighter
+  #1f2023;
+  #191a1d; darker
+
+   #21242b; blue-tint
+*/
+
+/*
+  hsl(187, 47%, 55%); // <-cyan
+  hsl(207, 82%, 66%); // <-blue
+  hsl(275, 60%, 47%); // <-purple
+  hsl(95, 38%, 62%); // <-green
+
+  hsl(355, 65%, 65%); // <-red 1
+  hsl(5, 48%, 51%); // <-red 2
+
+  hsl(29, 54%, 61%); // <-orange 1
+  hsl(39, 67%, 69%); // <-orange 2
+*/
