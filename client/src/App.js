@@ -1,32 +1,67 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
-import io from "socket.io-client";
 
-const endpoint = "http://localhost:5001";
-const socket = io(endpoint);
+import ChatroomList from "./ChatroomList";
 
-const App = () => {
-  const [userName, setUserName] = useState(null);
-  const [room, setRoom] = useState(null);
+const App = props => {
+  const [ username, setUsername ] = useState( "GUEST-" + Math.ceil( Math.random() * 9999 ) );
+  const [ isEditingUsername, setIsEditing ] = useState(false);
+  const usernameEditRef = useRef();
+  const { client } = props;
 
-  useEffect(() => {
-    if (!userName) {
-      console.log("Getting name from server");
-      socket.emit("getUserName", data => {
-        console.log("got:", data);
-      });
+
+  const myTestFunc = () => {
+  }
+
+  const tryUsernameChange = e => {
+    e.preventDefault();
+    const name = usernameEditRef.current.value;
+
+    if(name === username){
+      console.log('name unchanged');
+      setIsEditing(false);
     }
-  });
+
+    client.setUsername(name, changeUsername);
+  }
+
+  const changeUsername = name => {
+    if(name) {
+      setUsername(name);
+      setIsEditing(false);
+    }
+    else {
+      alert("Username in use. Try a different username.");
+      console.log('NAME CHANGE FAILED');
+    }
+  }
+
+  const handleCancelClick = e => {
+    e.preventDefault();
+    setIsEditing(false);
+  }
+
+  const renderUsernameContent = () => {
+    if(isEditingUsername) {
+      return <div><form><input ref={usernameEditRef} defaultValue={username}/><button type="submit" onClick={tryUsernameChange}>OK</button><button onClick={handleCancelClick}>Cancel</button></form></div>
+    } else {
+      return <div>Username: {username} <button onClick={() => setIsEditing(true)}>CHANGE</button></div>
+    }
+  }
 
   return (
     <div className="App-container">
       <div className="header">
         <div className="header-title">CHAT APP</div>
-        <div className="header-userName">GUEST1234</div>
+        <button onClick={myTestFunc}>TEST</button>
+        <div className="header-userName">{renderUsernameContent()}
+        </div>
       </div>
       <div className="main">
         <div className="chatRoomList-container">
-          <div className="chatRoomList-content">Rooms</div>
+          <div className="chatRoomList-content">
+            <ChatroomList client={client}/>
+          </div>
         </div>
         <div className="chatWindow-container">
           <div className="chatWindow-content">Chat Content</div>
