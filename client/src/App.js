@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 
 import ChatroomList from "./ChatroomList";
+import Chatroom from "./Chatroom";
 
 const App = props => {
   const [ username, setUsername ] = useState( "GUEST-" + Math.ceil( Math.random() * 9999 ) );
@@ -9,7 +10,7 @@ const App = props => {
   const usernameEditRef = useRef();
   const { client } = props;
 
-
+  // DEV
   const myTestFunc = () => {
   }
 
@@ -58,17 +59,8 @@ const App = props => {
         </div>
       </div>
       <div className="main">
-        <div className="chatRoomList-container">
-          <div className="chatRoomList-content">
-            <ChatroomList client={client}/>
-          </div>
-        </div>
-        <div className="chatWindow-container">
-          <div className="chatWindow-content">Chat Content</div>
-        </div>
-        <div className="userList-container">
-          <div className="userList-content">Users</div>
-        </div>
+        <ChatroomList client={client}/>
+        <Chatroom client={client}/>
       </div>
       <div className="footer">IMA FOOTER</div>
     </div>

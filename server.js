@@ -5,27 +5,9 @@ const PORT = process.env.PORT || 5001;
 
 const users = new Map();
 
-// const rooms = new Map();
-// rooms.set("Room One", ["Ornn", "Octavio", "Oliver"]);
-// rooms.set("Room Two", ["Terry", "Tim", "Tom"]);
-// rooms.set("Room Three", ["Thidwick", "Thurgood", "Thadius"]);
-
-/// DEV
-users.set(1, "Ornn");
-users.set(2, "Octavio");
-users.set(3, "Oliver");
-users.set(4, "Terry");
-users.set(5, "Tim");
-users.set(6, "Tom");
-users.set(7, "Fred");
-users.set(8, "Francis");
-users.set(9, "Fiora");
-
 const rooms = {};
-rooms["Room One"] = ["Ornn", "Octavio", "Oliver"];
-rooms["Room Two"] = ["Terry", "Tim", "Tom"];
-rooms["Room Four"] = ["Fred", "Francis", "Fiora"];
-/// END DEV
+
+//rooms["Room One"] = ["Ornn", "Octavio", "Oliver"];
 
 const findName = name => {
   for(let [k, v] of users){
@@ -46,8 +28,10 @@ io.on("connection", client => {
   })
 
   client.on("createChatroom", chatroomName => {
+    // TODO: remove user from current room -> remove room if empty
     rooms[chatroomName] = [users.get(client.id)];
     client.emit("updateChatrooms", rooms);
+    // client.emit("userJoinChatroom", chatroomName);
     //or client send (name, null, callback), server broadcasts
   })
 
@@ -61,6 +45,11 @@ io.on("connection", client => {
       users.set(client.id, name);
       callback(name);
     }
+  })
+
+  client.on("message", message => {
+    console.log('got message, sending it back');
+    client.emit("message", message);
   })
 
   client.on("disconnect", () => {

@@ -1,11 +1,12 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useRef} from "react";
 
 export default (props) => {
-  console.log('loading chatroomlist');
   const [chatroomList, setChatroomList] = useState([]);
+  const chatroomCreateRef = useRef();
+
 
   useEffect(() => {
-    console.log('ChatroomList mounted');
+    console.log('ChatroomList mount');
     props.client.getChatrooms(setChatroomList);
     props.client.listenForChatrooms(onChatroomUpdate);
   }, []);
@@ -17,20 +18,34 @@ export default (props) => {
   const renderChatrooms = () => {
     if(chatroomList)
     {
-      console.log('list:', chatroomList);
+      // console.log('list:', chatroomList);
       const chatroomArray = [];
       for(let i in chatroomList){
         chatroomArray.push({name: i, users: chatroomList[i]})
       }
-      console.log("chatroomArray: ", chatroomArray);
+      console.log("chatroomsArray: ", chatroomArray);
 
       return <>{chatroomArray.map(chatroom => <div key={chatroom.name}>{chatroom.name} ({chatroom.users.length})</div>)}</>
 
     } else return <div>No chatrooms available</div>
   }
 
-  return (<div>
-            MY CHATROOM LIST COMPONENT
-            <div>{renderChatrooms()}</div>
-          </div>)
+  const handleCreateChatroomSubmit = e => {
+    e.preventDefault();
+    const roomName = chatroomCreateRef.current.value;
+    console.log('submitting:', roomName);
+    props.client.createChatroom(roomName);
+    chatroomCreateRef.current.value = "";
+  }
+
+  return (
+          <div className="chatRoomList-container">
+            <div>Chatrooms</div>
+            <div></div>
+            <div className="chatRoomList-content">{renderChatrooms()}</div>
+
+            <button onClick={() => {}}>JOIN</button>
+            <form><input type="text" ref={chatroomCreateRef}/ ><button onClick={handleCreateChatroomSubmit}>CREATE</button></form>
+          </div>
+  )
 }

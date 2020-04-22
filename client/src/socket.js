@@ -5,12 +5,10 @@ export default () => {
   const socket = io(endpoint);
 
   const getChatrooms = callback => {
-    console.log('getting chatrooms..');
     socket.emit("getChatrooms", null, callback)
   }
 
   const listenForChatrooms = callback => {
-    console.log('in updateChatrooms in socket.js');
     socket.on('updateChatrooms', callback);
   }
 
@@ -22,8 +20,17 @@ export default () => {
     socket.emit("setUsername", name, callback);
   }
 
+  const listenForMessages = callback => {
+    socket.on('message', callback)
+  }
+
+  const sendMessage = message => {
+    console.log('got a message');
+    socket.emit("message", message);
+  }
+
 
   return {
-    getChatrooms, listenForChatrooms, createChatroom, setUsername
+    socket, getChatrooms, listenForChatrooms, createChatroom, setUsername, listenForMessages, sendMessage
   }
 }

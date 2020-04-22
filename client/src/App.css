@@ -13,7 +13,8 @@ body {
 .App-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 50rem;
+  max-height: 70rem;
 }
 
 .header {
@@ -38,30 +39,53 @@ body {
 
 .main {
   display: flex;
-  justify-content: space-between;
   text-align: center;
   flex: 1;
+
 }
 
 .chatRoomList-container {
   background-color: green;
   width: 20rem;
+  /* height: 100%; */
 }
 
 .chatRoomList-content {
   border: 2px solid black;
-  height: 100%;
   background-color: orange;
 }
 
-.chatWindow-container {
-  background-color: red;
+.chatroom-container {
+  background-color: orange;
+  display: flex;
   flex-grow: 1;
+  border: 1px solid white;
 }
 
-.chatWindow-content {
-  background-color: yellow;
+.chatWindow-container {
+  background-color: pink;
+  flex-grow: 1;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.chatWindow-name {
+  background-color: blue;
+  border: 2px solid black;
+
+}
+
+.chatWindow-chatLog {
+  background-color: orange;
+  border: 2px solid black;
+  flex-grow: 1;
+  overflow-y: scroll;
+  max-height: 70rem;
+}
+
+.chatWindow-inputBar {
+  background-color: cyan;
   border: 2px solid black;
 }
 
@@ -72,7 +96,7 @@ body {
 
 .userList-content {
   height: 100%;
-  background-color: red;
+  background-color: green;
   border: 2px solid black;
 }
 
