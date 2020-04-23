@@ -4,6 +4,11 @@ export default () => {
   const endpoint = "http://localhost:5001";
   const socket = io(endpoint);
 
+  socket.on("tempError", err => {
+    console.log("Error:", err);
+    alert("Error:", err);
+  })
+
   const getChatrooms = callback => {
     socket.emit("getChatrooms", null, callback)
   }
@@ -12,8 +17,8 @@ export default () => {
     socket.on('updateChatrooms', callback);
   }
 
-  const createChatroom = chatroomName => {
-    socket.emit("createChatroom", chatroomName);
+  const createChatroom = (chatroomName, callback) => {
+    socket.emit("createChatroom", chatroomName, callback);
   }
 
   const setUsername = (name, callback) => {
@@ -29,8 +34,17 @@ export default () => {
     socket.emit("message", message);
   }
 
+  const listenForUserList = callback => {
+    socket.on("userList", callback);
+  }
 
+
+  // DEV
+  const checkVars = () => {
+    socket.emit("checkVars");
+  }
+  // END DEV
   return {
-    socket, getChatrooms, listenForChatrooms, createChatroom, setUsername, listenForMessages, sendMessage
+    getChatrooms, listenForChatrooms, createChatroom, setUsername, listenForMessages, sendMessage, listenForUserList, checkVars
   }
 }

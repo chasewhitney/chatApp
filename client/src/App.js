@@ -10,10 +10,16 @@ const App = props => {
   const usernameEditRef = useRef();
   const { client } = props;
 
+  useEffect(() => {
+    client.setUsername(username, changeUsername);
+  },[])
+
   // DEV
   const myTestFunc = () => {
+    client.checkVars();
   }
-
+  // END DEV
+  
   const tryUsernameChange = e => {
     e.preventDefault();
     const name = usernameEditRef.current.value;

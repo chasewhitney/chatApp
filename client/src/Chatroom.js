@@ -1,6 +1,7 @@
 import React from "react";
 
 import ChatWindow from "./ChatWindow";
+import UserList from "./UserList";
 
 export default props => {
   console.log('RENDER CHATROOM');
@@ -21,9 +22,7 @@ export default props => {
         <ChatWindow client={client}/>
         <div className="chatWindow-inputBar">IMA INPUT BAR</div>
       </div>
-      <div className="userList-container">
-        <div className="userList-content">Users</div>
-      </div>
+      <UserList client={client} />
     </div>
   )
 }

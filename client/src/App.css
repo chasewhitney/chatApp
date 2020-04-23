@@ -41,18 +41,28 @@ body {
   display: flex;
   text-align: center;
   flex: 1;
-
 }
 
-.chatRoomList-container {
-  background-color: green;
+.chatroomList-container {
+  background-color: magenta;
   width: 20rem;
   /* height: 100%; */
+  display: flex;
+  flex-direction: column;
 }
 
-.chatRoomList-content {
+.chatroomList-header {
+  background-color: green;
+}
+
+.chatroomList-content {
   border: 2px solid black;
-  background-color: orange;
+  background-color: blue;
+  flex-grow: 1;
+}
+
+.chatroomList-inputs {
+  background-color: red;
 }
 
 .chatroom-container {
@@ -90,14 +100,21 @@ body {
 }
 
 .userList-container {
-  background-color: blue;
+  background-color: magenta;
+  height: 100%;
   width: 25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.userList-header {
+  background-color: green;
 }
 
 .userList-content {
-  height: 100%;
-  background-color: green;
+  background-color: blue;
   border: 2px solid black;
+  flex-grow: 1;
 }
 
 .footer {
@@ -105,6 +122,7 @@ body {
   justify-content: center;
   align-items: center;
   height: 5rem;
+  background-color: purple;
 }
 /* default: #ffffff */
 
