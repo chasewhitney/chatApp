@@ -21,5 +21,6 @@ export default props => {
     })}</div>
   }
 
+  console.log("Rending ChatWindow");
   return <div className="chatWindow-chatLog">{renderChatLog()}</div>
 }

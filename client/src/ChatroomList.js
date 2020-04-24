@@ -5,7 +5,7 @@ export default props => {
   const chatroomCreateRef = useRef();
   let chatroomToJoin = '';
 
-  const {client} = props;
+  const {client, joinChatroom} = props;
 
   useEffect(() => {
     client.getChatrooms(setChatroomList);
@@ -16,7 +16,7 @@ export default props => {
     setChatroomList(chatroomList);
   }
 
-  const handleListClick = (e,chatroomName) => {
+  const handleListClick = (e, chatroomName) => {
     e.preventDefault();
     chatroomToJoin = chatroomName;
   }
@@ -24,37 +24,17 @@ export default props => {
   const handleJoinClick = e => {
     e.preventDefault();
     if(chatroomToJoin) {
-      client.joinChatroom(chatroomToJoin, handleJoinResponse);
+      joinChatroom(chatroomToJoin);
       chatroomToJoin = '';
-    }
-  }
-
-  const handleJoinResponse = res => {
-    if(res) {
-      console.log('handleJoinResponse:', res);
-      props.setChatroomName(res);
-    } else {
-      console.log('handleJoinResponse: failure');
-      // Do stuff
     }
   }
 
   const handleCreateSubmit = e => {
     e.preventDefault();
     const roomName = chatroomCreateRef.current.value;
-    console.log('submitting:', roomName);
-    client.createChatroom(roomName, handleCreateResponse);
+    console.log('creating:', roomName);
+    joinChatroom(roomName);
     chatroomCreateRef.current.value = "";
-  }
-
-  const handleCreateResponse = res => {
-    if(res) {
-      console.log('handleCreateResponse:', res);
-      // Do stuff
-    } else {
-      console.log('handleCreateResponse: failure');
-      // Do stuff
-    }
   }
 
   const testFunc = () => {
@@ -70,6 +50,7 @@ export default props => {
     }
   }
 
+  console.log('rendering ChatroomList');
   return (
           <div className="chatroomList-container">
             <div className="chatroomList-header">Chatrooms</div>

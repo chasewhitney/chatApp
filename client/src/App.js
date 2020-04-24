@@ -13,12 +13,19 @@ const App = props => {
   const { client } = props;
 
   useEffect(() => {
+    console.log('username:', username);
     client.setUsername(username, changeUsername);
-    client.listenForChatroomName(handleSetChatroomName);
+    // client.listenForChatroomName(handleSetChatroomName);
   },[])
 
-  const handleSetChatroomName = chatroomName => {
-    setChatroomName(chatroomName);
+  const handleChatroomChange = newChatroomName => {
+    console.log(`Changing rooms from ${chatroomName} to ${newChatroomName}`);
+    client.setChatroom(chatroomName, newChatroomName, handleSetChatroomResponse);
+  }
+
+  const handleSetChatroomResponse = res => {
+    console.log('setting chatroom to:', res);
+    setChatroomName(res);
   }
 
   // DEV
@@ -72,8 +79,8 @@ const App = props => {
         </div>
       </div>
       <div className="main">
-        <ChatroomList client={client} setChatroomName={handleSetChatroomName}/>
-        <Chatroom client={client} chatroomName={chatroomName}/>
+        <ChatroomList client={client} joinChatroom={handleChatroomChange}/>
+        <Chatroom client={client} chatroomName={chatroomName} leaveChatroom={handleChatroomChange}/>
       </div>
       <div className="footer">IMA FOOTER</div>
     </div>

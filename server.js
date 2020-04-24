@@ -4,15 +4,7 @@ const io = require("socket.io")(server);
 const PORT = process.env.PORT || 5001;
 
 const users = new Map();
-// user: (client.id, name)
-
-// const chatrooms = {};
-// // chatrooms["Room One"] = Map(client.id, name)
-// chatrooms["Test One"] = new Map();
-// chatrooms["Test One"].set(12345, "Robodude");
-
 const chatrooms = new Map();
-chatrooms.set("Test Room One", new Map());
 
 const findName = name => {
   console.log('in findName with:', name);
@@ -28,13 +20,20 @@ const chatroomExists = chatroomName => {
   return chatrooms.has(chatroomName);
 }
 
-const createNewChatroom = chatroomName => {
 
+const sendUserList = chatroomName => {
+  const userList = Array.from(chatrooms.get(chatroomName).values());
+  const userIDs = chatrooms.get(chatroomName).keys();
+  console.log("userIDs:", userIDs);
+  for(let id of userIDs) {
+    io.to(id).emit("userList", userList);
+  }
 }
 
-const leaveChatroom = user => {
-  user.chatroom = null;
-  return user;
+const sendChatroomList = () => {
+  console.log('sending out chatroom list');
+  const chatroomList = Array.from(chatrooms.keys());
+  io.emit("chatroomList", chatroomList);
 }
 
 io.on("connection", client => {
@@ -44,52 +43,69 @@ io.on("connection", client => {
   client.on("getChatrooms", (_, callback) => {
     let chatroomNames = Array.from(chatrooms.keys());
     console.log('chatroom names:', chatroomNames);
-    callback(chatroomNames);
+    return callback(chatroomNames);
   })
 
-  // REFACTOR ME
-  client.on("createChatroom", (chatroomName, callback) => {
-    let user = users.get(client.id);
-    if(chatroomName && !chatroomExists(chatroomName)) {
-      // create chatroom
-      createNewChatroom(chatroomName);
-      // if user in chatroom, user leaves current chatroom
-      if(user.chatroom) {
-        user = leaveChatroom(user);
-      }
-      // user join new room
-      user = joinChatroom(user, chatroomName);
-      // broadcast updated chatroom list
-      io.emit("updateChatrooms", chatrooms);
-      // handle success...
-      client.emit("userList", chatrooms[chatroomName]);
-    } else {
-      client.emit("tempError", "Could not create chatroom");
+  client.on("setChatroom", (currentRoomName, newRoomName, callback) => {
+    // leave current room
+    if(currentRoomName === newRoomName){
+      return callback(newRoomName);
     }
+    let chatroomListChanged = false;
+    if(currentRoomName) {
+      chatrooms.get(currentRoomName).delete(client.id);
+      if(chatrooms.get(currentRoomName).size === 0)
+      {
+        console.log('deleting chatroom:', currentRoomName);
+        chatrooms.delete(currentRoomName);
+        chatroomListChanged = true;
+      } else {
+        sendUserList(currentRoomName);
+      };
+    }
+    // return null, user is leaving current room and not joining/creating another
+    if(!newRoomName){
+      if(chatroomListChanged) {
+        sendChatroomList()
+      };
+
+      return callback(null);
+    }
+    // user is joining or creating a room, create the room if it doesn't exist
+    if(!chatroomExists(newRoomName)){
+      chatrooms.set(newRoomName, new Map());
+      chatroomListChanged = true;
+    }
+    // join new room
+    chatrooms.get(newRoomName).set(client.id, users.get(client.id));
+    sendUserList(newRoomName);
+
+    if(chatroomListChanged) {
+      sendChatroomList()
+    };
+
+    return callback(newRoomName);
   })
 
   // TODO: REFACTOR ME
   client.on("setUsername", (name, callback )=> {
     const username = users.get(client.id);
-
     if(!name || (name !== username && findName(name))) {
-      callback(null);
+      return callback(null);
     } else {
+      console.log("setting name to:", name);
       users.set(client.id, name);
-      callback(name);
+      return callback(name);
     }
   })
 
-  client.on("joinChatroom", (chatroomName, callback) => {
+  client.on("getUserList", (chatroomName, callback) => {
     if(chatroomExists(chatroomName)) {
-      console.log('chatrooms pre user add:', chatrooms);
-      chatrooms.get(chatroomName).set(client.id, users.get(client.id));
-      console.log('chatrooms post user add:', chatrooms);
-      // UPDATE USERLIST
-      callback(chatroomName);
-    } else {
-      callback(null);
+      let userList = Array.from(chatrooms.get(chatroomName).values());
+      return callback(userList);
     }
+
+    return callback(null);
   })
 
   client.on("message", (message, chatroom) => {
@@ -98,7 +114,7 @@ io.on("connection", client => {
 
   client.on("disconnect", () => {
     console.log("User disconnected:", client.id)
-    users.delete(client.id);
+    return users.delete(client.id);
   })
 
   //DEV
