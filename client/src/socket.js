@@ -13,10 +13,6 @@ export default () => {
     socket.emit("getChatrooms", null, callback)
   }
 
-  const listenForChatrooms = callback => {
-    socket.on('updateChatrooms', callback);
-  }
-
   const createChatroom = (chatroomName, callback) => {
     socket.emit("createChatroom", chatroomName, callback);
   }
@@ -25,19 +21,30 @@ export default () => {
     socket.emit("setUsername", name, callback);
   }
 
-  const listenForMessages = callback => {
-    socket.on('message', callback)
-  }
-
   const sendMessage = message => {
     console.log('got a message');
     socket.emit("message", message);
+  }
+
+  const joinChatroom = (chatroomName, callback) => {
+    socket.emit("joinChatroom", chatroomName, callback);
+  }
+
+  const listenForChatrooms = callback => {
+    socket.on('chatroomList', callback);
+  }
+
+  const listenForMessages = callback => {
+    socket.on('message', callback)
   }
 
   const listenForUserList = callback => {
     socket.on("userList", callback);
   }
 
+  const listenForChatroomName = callback => {
+    socket.on("chatroomName", callback);
+  }
 
   // DEV
   const checkVars = () => {
@@ -45,6 +52,6 @@ export default () => {
   }
   // END DEV
   return {
-    getChatrooms, listenForChatrooms, createChatroom, setUsername, listenForMessages, sendMessage, listenForUserList, checkVars
+    getChatrooms, createChatroom, setUsername, joinChatroom, sendMessage, listenForMessages, listenForUserList, listenForChatrooms, listenForChatroomName, checkVars
   }
 }

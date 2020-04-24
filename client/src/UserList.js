@@ -11,7 +11,7 @@ export default props => {
 
   const renderUserList = () => {
     return (
-      <div>{users.map(user => <div>{user}</div>)}</div>
+      <div>{users.map(user => <div key={user}>{user}</div>)}</div>
     )
   }
 

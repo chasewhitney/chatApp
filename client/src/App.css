@@ -65,6 +65,11 @@ body {
   background-color: red;
 }
 
+.chatroomList-item:hover {
+  cursor: pointer;
+  background-color:pink;
+}
+
 .chatroom-container {
   background-color: orange;
   display: flex;

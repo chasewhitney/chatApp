@@ -4,15 +4,20 @@ const io = require("socket.io")(server);
 const PORT = process.env.PORT || 5001;
 
 const users = new Map();
-// user: (client.id, {name, chatroom})
+// user: (client.id, name)
 
-const chatrooms = {};
-// chatrooms["Room One"] = ["Ornn", "Octavio", "Oliver"];
+// const chatrooms = {};
+// // chatrooms["Room One"] = Map(client.id, name)
+// chatrooms["Test One"] = new Map();
+// chatrooms["Test One"].set(12345, "Robodude");
+
+const chatrooms = new Map();
+chatrooms.set("Test Room One", new Map());
 
 const findName = name => {
   console.log('in findName with:', name);
   for(let [k, v] of users){
-    if(v.name && v.name.toLowerCase() === name.toLowerCase()){
+    if(v && v.toLowerCase() === name.toLowerCase()){
       return true;
     }
   }
@@ -20,11 +25,11 @@ const findName = name => {
 }
 
 const chatroomExists = chatroomName => {
-  return chatrooms[chatroomName];
+  return chatrooms.has(chatroomName);
 }
 
 const createNewChatroom = chatroomName => {
-  chatrooms[chatroomName] = [];
+
 }
 
 const leaveChatroom = user => {
@@ -32,21 +37,17 @@ const leaveChatroom = user => {
   return user;
 }
 
-const joinChatroom = (user, chatroomName) => {
-  user.chatroom = chatroomName;
-  chatrooms[chatroomName].push(user.name);
-  return user;
-}
-
 io.on("connection", client => {
   console.log("User connected:", client.id);
-  users.set(client.id, {name: null, chatroom: null});
+  users.set(client.id, null);
 
   client.on("getChatrooms", (_, callback) => {
-    // console.log("Sending chatrooms:", chatrooms);
-    callback(chatrooms);
+    let chatroomNames = Array.from(chatrooms.keys());
+    console.log('chatroom names:', chatroomNames);
+    callback(chatroomNames);
   })
 
+  // REFACTOR ME
   client.on("createChatroom", (chatroomName, callback) => {
     let user = users.get(client.id);
     if(chatroomName && !chatroomExists(chatroomName)) {
@@ -59,35 +60,36 @@ io.on("connection", client => {
       // user join new room
       user = joinChatroom(user, chatroomName);
       // broadcast updated chatroom list
-      client.broadcast.emit("updateChatrooms", chatrooms);
+      io.emit("updateChatrooms", chatrooms);
       // handle success...
-
-      client.emit("joinChatroom", chatroomName);
       client.emit("userList", chatrooms[chatroomName]);
     } else {
       client.emit("tempError", "Could not create chatroom");
     }
   })
 
+  // TODO: REFACTOR ME
   client.on("setUsername", (name, callback )=> {
-    console.log('in setUsername with:', name);
-    const userObj = users.get(client.id);
-    console.log('userObj:', userObj);
-    console.log('setUsername got:', name);
-    if(name !== userObj.name && findName(name)) {
-      console.log('setUsername returning null');
+    const username = users.get(client.id);
+
+    if(!name || (name !== username && findName(name))) {
       callback(null);
     } else {
-      console.log('setUsername returning', name);
-      userObj.name = name;
-      users.set(client.id, userObj);
-      console.log('new userObj:', users.get(client.id));
+      users.set(client.id, name);
       callback(name);
     }
   })
 
-  client.on("initializeUsername", () => {
-
+  client.on("joinChatroom", (chatroomName, callback) => {
+    if(chatroomExists(chatroomName)) {
+      console.log('chatrooms pre user add:', chatrooms);
+      chatrooms.get(chatroomName).set(client.id, users.get(client.id));
+      console.log('chatrooms post user add:', chatrooms);
+      // UPDATE USERLIST
+      callback(chatroomName);
+    } else {
+      callback(null);
+    }
   })
 
   client.on("message", (message, chatroom) => {
@@ -111,11 +113,14 @@ server.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
 });
 
+// TODO: refactor create/join/leave on client and server
 // TODO: Implement context for socket()
-// TODO: Better error handling
+// TODO: Error handling
 // TODO: create component for username - avoid re rendering App on username edit state
-// TODO: broadcast vs emit: createChatroom
 // TODO: consider _ debounce on client updating chatroom/user info
 // TODO: validation
 
 // Stretch
+// emote
+// diceroll
+// esay

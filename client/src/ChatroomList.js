@@ -1,54 +1,82 @@
 import React, {useState, useEffect, useRef} from "react";
 
-export default (props) => {
+export default props => {
   const [chatroomList, setChatroomList] = useState([]);
   const chatroomCreateRef = useRef();
+  let chatroomToJoin = '';
+
+  const {client} = props;
 
   useEffect(() => {
-    console.log('ChatroomList mount');
-    props.client.getChatrooms(setChatroomList);
-    props.client.listenForChatrooms(onChatroomUpdate);
+    client.getChatrooms(setChatroomList);
+    client.listenForChatrooms(onChatroomUpdate);
   }, []);
 
   const onChatroomUpdate = chatroomList => {
     setChatroomList(chatroomList);
   }
 
-  const renderChatrooms = () => {
-    if(chatroomList)
-    {
-      // console.log('list:', chatroomList);
-      const chatroomArray = [];
-      for(let i in chatroomList){
-        chatroomArray.push({name: i, users: chatroomList[i]})
-      }
-      console.log("chatroomsArray: ", chatroomArray);
+  const handleListClick = (e,chatroomName) => {
+    e.preventDefault();
+    chatroomToJoin = chatroomName;
+  }
 
-      return <>{chatroomArray.map(chatroom => <div key={chatroom.name}>{chatroom.name} ({chatroom.users.length})</div>)}</>
+  const handleJoinClick = e => {
+    e.preventDefault();
+    if(chatroomToJoin) {
+      client.joinChatroom(chatroomToJoin, handleJoinResponse);
+      chatroomToJoin = '';
+    }
+  }
 
-    } else return <div>No chatrooms available</div>
+  const handleJoinResponse = res => {
+    if(res) {
+      console.log('handleJoinResponse:', res);
+      props.setChatroomName(res);
+    } else {
+      console.log('handleJoinResponse: failure');
+      // Do stuff
+    }
   }
 
   const handleCreateSubmit = e => {
     e.preventDefault();
     const roomName = chatroomCreateRef.current.value;
     console.log('submitting:', roomName);
-    props.client.createChatroom(roomName, handleCreateResponse);
+    client.createChatroom(roomName, handleCreateResponse);
     chatroomCreateRef.current.value = "";
   }
 
   const handleCreateResponse = res => {
     if(res) {
+      console.log('handleCreateResponse:', res);
+      // Do stuff
+    } else {
+      console.log('handleCreateResponse: failure');
+      // Do stuff
+    }
+  }
 
+  const testFunc = () => {
+    console.log('in testFunc');
+  }
+
+  const renderChatrooms = () => {
+    if(chatroomList)
+    {
+      return <>{chatroomList.map(chatroomName => <div onClick={(e) => handleListClick(e, chatroomName)} key={chatroomName} className="chatroomList-item">{chatroomName}</div>)}</>
+    } else {
+      return <div>No chatrooms available</div>
     }
   }
 
   return (
           <div className="chatroomList-container">
             <div className="chatroomList-header">Chatrooms</div>
+            <button onClick={testFunc}>TEST</button>
             <div className="chatroomList-content">{renderChatrooms()}</div>
             <div className="chatroomList-inputs">
-              <button onClick={() => {}}>JOIN</button>
+              <button onClick={handleJoinClick}>JOIN</button>
               <form><input type="text" ref={chatroomCreateRef}/ ><button onClick={handleCreateSubmit}>CREATE</button></form>
             </div>
           </div>

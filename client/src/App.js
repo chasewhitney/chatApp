@@ -5,21 +5,28 @@ import ChatroomList from "./ChatroomList";
 import Chatroom from "./Chatroom";
 
 const App = props => {
-  const [ username, setUsername ] = useState( "GUEST-" + Math.ceil( Math.random() * 9999 ) );
+  const [ username, setUsername ] = useState( "GUEST-" + Math.ceil( Math.random() * 999999 ) );
   const [ isEditingUsername, setIsEditing ] = useState(false);
+  const [ chatroomName, setChatroomName] = useState('');
   const usernameEditRef = useRef();
+
   const { client } = props;
 
   useEffect(() => {
     client.setUsername(username, changeUsername);
+    client.listenForChatroomName(handleSetChatroomName);
   },[])
+
+  const handleSetChatroomName = chatroomName => {
+    setChatroomName(chatroomName);
+  }
 
   // DEV
   const myTestFunc = () => {
     client.checkVars();
   }
   // END DEV
-  
+
   const tryUsernameChange = e => {
     e.preventDefault();
     const name = usernameEditRef.current.value;
@@ -65,8 +72,8 @@ const App = props => {
         </div>
       </div>
       <div className="main">
-        <ChatroomList client={client}/>
-        <Chatroom client={client}/>
+        <ChatroomList client={client} setChatroomName={handleSetChatroomName}/>
+        <Chatroom client={client} chatroomName={chatroomName}/>
       </div>
       <div className="footer">IMA FOOTER</div>
     </div>
