@@ -23,12 +23,11 @@ const chatroomExists = chatroomName => {
 
 const sendUserList = chatroomName => {
   const userList = Array.from(chatrooms.get(chatroomName).values());
-  // const userIDs = chatrooms.get(chatroomName).keys();
-  // console.log("userIDs:", userIDs);
-  // for(let id of userIDs) {
-  //   io.to(id).emit("userList", userList);
-  // }
-  io.to(chatroomName).emit("userList", userList);
+  const userIDs = chatrooms.get(chatroomName).keys();
+  console.log("userIDs:", userIDs);
+  for(let id of userIDs) {
+    io.to(id).emit("userList", userList);
+  }
 }
 
 const sendChatroomList = () => {
@@ -57,7 +56,6 @@ io.on("connection", client => {
 
     if(currentRoomName) {
       chatrooms.get(currentRoomName).delete(client.id);
-      client.leave(currentRoomName);
       if(chatrooms.get(currentRoomName).size === 0)
       {
         console.log('deleting chatroom:', currentRoomName);
@@ -82,7 +80,6 @@ io.on("connection", client => {
     }
     // join new room
     chatrooms.get(newRoomName).set(client.id, users.get(client.id));
-    client.join(newRoomName);
     sendUserList(newRoomName);
 
     if(chatroomListChanged) {
@@ -113,18 +110,16 @@ io.on("connection", client => {
     return callback(null);
   })
 
-  client.on("message", (content, chatroomName, callback) => {
-    const user = users.get(client.id)
-    console.log(`Received ${content} from ${user} to ${chatroomName}`);
+  client.on("message", (message, chatroomName, callback) => {
+    console.log(`Received ${message} from ${users.get(client.id)} to ${chatroomName}`);
 
-    // const usersToMessage = chatrooms.get(chatroomName).keys();
-    // for(let user of usersToMessage){
-    //   io.to(user).emit("message", message);
-    // }
+    const usersToMessage = chatrooms.get(chatroomName).keys();
 
-    client.to(chatroomName).emit("message", {user, content});
+    for(let user of usersToMessage){
+      io.to(user).emit("message", message);
+    }
 
-    return callback({user, content});
+    return callback(message);
 
   })
 

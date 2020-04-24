@@ -18,8 +18,7 @@ export default props => {
           <div className="chatWindow-name">
             {chatroomName} <button onClick={handleLeaveClick}>Leave</button>
           </div>
-          <ChatWindow client={client}/>
-          <div className="chatWindow-inputBar">IMA INPUT BAR</div>
+          <ChatWindow client={client} chatroomName={chatroomName}/>          
         </div>
         <UserList client={client} chatroomName={chatroomName}/>
       </div>

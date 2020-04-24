@@ -9,6 +9,7 @@ export default () => {
     alert("Error:", err);
   })
 
+  // EMITTERS
   const getChatrooms = callback => {
     socket.emit("getChatrooms", null, callback)
   }
@@ -17,31 +18,19 @@ export default () => {
     socket.emit("getUserList", chatroomName, callback);
   }
 
-  // const createChatroom = (chatroomName, callback) => {
-  //   socket.emit("createChatroom", chatroomName, callback);
-  // }
-
   const setUsername = (name, callback) => {
     socket.emit("setUsername", name, callback);
   }
 
-  const sendMessage = message => {
-    console.log('got a message');
-    socket.emit("message", message);
+  const sendMessage = (message, chatroomName, callback) => {
+    socket.emit("message", message, chatroomName, callback);
   }
-
-  // const joinChatroom = (chatroomName, callback) => {
-  //   socket.emit("joinChatroom", chatroomName, callback);
-  // }
-  //
-  // const leaveChatroom = (chatroomName, callback) => {
-  //   socket.emit("leaveChatroom", chatroomName, callback);
-  // }
 
   const setChatroom = (currentRoom, newRoom, callback) => {
     socket.emit("setChatroom", currentRoom, newRoom, callback);
   }
 
+  // LISTENERS
   const listenForChatrooms = callback => {
     socket.on('chatroomList', callback);
   }
