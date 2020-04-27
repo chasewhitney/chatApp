@@ -8,33 +8,78 @@ body {
   font-family: "Staatliches";
   color: #ffffff;
   font-size: 3rem;
+  margin: 0;
+  padding: 0;
 }
 
 .App-container {
   display: flex;
   flex-direction: column;
-  min-height: 50rem;
-  max-height: 70rem;
+  min-height: 100vh;
 }
 
-.header {
+.header-container {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: stretch;
   background-color: #242529;
-  border-bottom: 2px solid #49515f;
-  padding: 0.5rem 1rem;
+  /* background-color: black; */
 }
 
 .header-title {
-  font-size: 2.5rem;
+  font-size: 3rem;
+  min-width: 25rem;
+  text-align: center;
+  border-right: 1px solid white;
+  /* background-color: grey; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.header-userName {
-  font-size: 2.5rem;
+.header-chatroomName {
+  font-size: 5rem;
+  background-color: blue;
+}
 
-  right: 0;
-  top: 0;
+.header-username-container{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  /* background-color: gray; */
+  padding: 1rem;
+}
+
+.header-username-label {
+  font-size: 3rem;
+  padding: 0 1rem;
+  /* background-color:pink; */
+}
+
+.header-username-name {
+  font-size: 3rem;
+  /* background-color: orange; */
+  margin-bottom: -.5rem;
+  cursor: pointer;
+  border: 1px solid white;
+  border-radius: 3px;
+  padding: .25rem 1rem;
+}
+
+.header-username-change {
+
+}
+
+.header-username-input {
+
+}
+
+.header-username-cancel{
+
+}
+
+.header-username-ok {
+
 }
 
 .main {
@@ -43,12 +88,24 @@ body {
   flex: 1;
 }
 
+.main-noChatroom {
+  margin: auto;
+}
+
+
+.main-noChatroom-hello {
+
+}
+
+.main-noChatroom-click {
+
+}
 .chatroomList-container {
-  background-color: magenta;
-  width: 20rem;
+  /* background-color: grey; */
   /* height: 100%; */
   display: flex;
   flex-direction: column;
+  border-right: 1px solid white;
 }
 
 .chatroomList-header {
@@ -56,13 +113,23 @@ body {
 }
 
 .chatroomList-content {
-  border: 2px solid black;
   background-color: blue;
-  flex-grow: 1;
+  max-height: 50%;
+  width: 25rem;
+  overflow-y: auto;
 }
 
-.chatroomList-inputs {
-  background-color: red;
+.chatroomList-itemContainer {
+
+}
+
+.chatroomList-noItems {
+
+}
+
+.chatroomList-item {
+  padding:.25rem 1.25rem;
+  text-align: left;
 }
 
 .chatroomList-item:hover {
@@ -70,44 +137,82 @@ body {
   background-color:pink;
 }
 
-.chatroom-container {
-  background-color: orange;
-  display: flex;
-  flex-grow: 1;
-  border: 1px solid white;
+.chatroomList-inputs {
+  background-color: red;
+  flex: 1;
 }
 
+.chatroomList-textInput {
+}
+
+.chatroomList-submit {
+
+}
+
+.chatList-form {
+  display: flex;
+  justify-content: space-around;
+}
+
+.chatroom-container {
+  /* background-color: orange; */
+  display: flex;
+  flex-grow: 1;
+}
+
+
 .chatWindow-container {
-  background-color: pink;
+  /* background-color: pink; */
   flex-grow: 1;
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.chatWindow-name {
-  background-color: blue;
-  border: 2px solid black;
-
-}
-
 .chatWindow-chatLog {
-  background-color: orange;
-  border: 2px solid black;
+  /* background-color: green; */
   flex-grow: 1;
   overflow-y: scroll;
-  max-height: 70rem;
+  padding: 1rem;
+  justify-content: flex-start;
+  font-family: "Roboto";
 }
 
 .chatWindow-inputBar {
   background-color: cyan;
-  border: 2px solid black;
+  width: 100%;
+  height: 100%;
+  font-size: 3rem;
+}
+
+.chat-item{
+ width: 100%;
+ /* background-color: pink; */
+ text-align: left;
+ padding: .25rem;
+ display: flex;
+}
+
+.chat-item-sender{
+  font-weight:bold;
+  color: yellow;
+  margin-right: 1rem;
+}
+.chat-item-content{}
+
+.chat-serverMessage{
+  font-style:italic;
+  width: 100%;
+  /* background-color: orange; */
+  text-align: left;
+  padding: .25rem;
+  color: grey;
 }
 
 .userList-container {
   background-color: magenta;
   height: 100%;
-  width: 25rem;
+
   display: flex;
   flex-direction: column;
 }
@@ -117,10 +222,20 @@ body {
 }
 
 .userList-content {
+  width: 25rem;
   background-color: blue;
-  border: 2px solid black;
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: .5rem 1rem;
+  overflow-y: scroll;
 }
+
+.userList-item {
+  font-size: 2.5rem;
+}
+
 
 .footer {
   display: flex;

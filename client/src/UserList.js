@@ -6,11 +6,11 @@ export default props => {
   const { client, chatroomName } = props;
 
   useEffect( () => {
-    client.getUserList(chatroomName, handleGetUsersResponse);
     client.listenForUserListUpdate(handleUserListUpdate);
   }, [])
 
   const handleUserListUpdate = userList => {
+    console.log('got userlist:', userList);
     setUsers(userList);
   }
 
@@ -21,17 +21,17 @@ export default props => {
 
   const renderUserList = () => {
     return (
-      <div>{users.map(user => <div key={user}>{user}</div>)}</div>
+      <>{users.map(user => <div className="userList-item" key={user}>{user}</div>)}</>
     )
   }
 
 
 
-  useEffect(() => {
-    console.log('hit userlist Effect');
-  })
+  // useEffect(() => {
+  //   console.log('hit userlist Effect');
+  // })
 
-  console.log("Rendering userlist");
+  // console.log("Rendering userlist");
   return (
     <div className="userList-container">
       <div className="userList-header">Users</div>

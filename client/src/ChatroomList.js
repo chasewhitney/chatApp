@@ -10,6 +10,8 @@ export default props => {
   useEffect(() => {
     client.getChatrooms(setChatroomList);
     client.listenForChatrooms(onChatroomUpdate);
+    //DEV
+    // setChatroomList(["RoomOne", "Two", "Three","RoomOne", "Two", "Three","RoomOne", "Two", "Three","RoomOne", "Two", "Three","RoomOne", "Two", "Three","RoomOne", "Two", "Three"]);
   }, []);
 
   const onChatroomUpdate = chatroomList => {
@@ -18,21 +20,13 @@ export default props => {
 
   const handleListClick = (e, chatroomName) => {
     e.preventDefault();
-    chatroomToJoin = chatroomName;
-  }
-
-  const handleJoinClick = e => {
-    e.preventDefault();
-    if(chatroomToJoin) {
-      joinChatroom(chatroomToJoin);
-      chatroomToJoin = '';
-    }
+    joinChatroom(chatroomName);
   }
 
   const handleCreateSubmit = e => {
     e.preventDefault();
     const roomName = chatroomCreateRef.current.value;
-    console.log('creating:', roomName);
+    // console.log('creating:', roomName);
     joinChatroom(roomName);
     chatroomCreateRef.current.value = "";
   }
@@ -42,23 +36,23 @@ export default props => {
   }
 
   const renderChatrooms = () => {
-    if(chatroomList)
+    if(chatroomList.length > 0)
     {
-      return <>{chatroomList.map(chatroomName => <div onClick={(e) => handleListClick(e, chatroomName)} key={chatroomName} className="chatroomList-item">{chatroomName}</div>)}</>
+      return <div className="chatroomList-itemsContainer">{chatroomList.map(chatroomName => <div onClick={(e) => handleListClick(e, chatroomName)} key={chatroomName} className="chatroomList-item">{chatroomName}</div>)}</div>
     } else {
-      return <div>No chatrooms available</div>
+      return <div className="chatroomList-noItems">No chatrooms available</div>
     }
   }
 
-  console.log('rendering ChatroomList');
+  // console.log('rendering ChatroomList');
   return (
           <div className="chatroomList-container">
             <div className="chatroomList-header">Chatrooms</div>
-            <button onClick={testFunc}>TEST</button>
             <div className="chatroomList-content">{renderChatrooms()}</div>
             <div className="chatroomList-inputs">
-              <button onClick={handleJoinClick}>JOIN</button>
-              <form><input type="text" ref={chatroomCreateRef}/ ><button onClick={handleCreateSubmit}>CREATE</button></form>
+              <div>( Click to join )</div>
+              <div>Or</div>
+              <form className="chatList-form"><input className="chatroomList-textInput" type="text" ref={chatroomCreateRef}/ ><button className="chatroomList-submit" onClick={handleCreateSubmit}>CREATE</button></form>
             </div>
           </div>
   )

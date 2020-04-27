@@ -18,8 +18,8 @@ export default () => {
     socket.emit("getUserList", chatroomName, callback);
   }
 
-  const setUsername = (name, callback) => {
-    socket.emit("setUsername", name, callback);
+  const setUsername = (newName, currentName, chatroomName, callback) => {
+    socket.emit("setUsername", newName, currentName, chatroomName, callback);
   }
 
   const sendMessage = (message, chatroomName, callback) => {

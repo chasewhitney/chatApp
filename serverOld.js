@@ -23,15 +23,12 @@ const chatroomExists = chatroomName => {
 
 const sendUserList = chatroomName => {
   const userList = Array.from(chatrooms.get(chatroomName).values());
-  const userIDs = chatrooms.get(chatroomName).keys();
-  console.log("userIDs:", userIDs);
-  for(let id of userIDs) {
-    io.to(id).emit("userList", userList);
-  }
+  console.log('emitting userList:', userList);
+  io.to(chatroomName).emit("userList", userList);
 }
 
-const sendChatroomList = () => {
-  console.log('sending out chatroom list');
+// DRY
+const emitChatroomList = () => {
   const chatroomList = Array.from(chatrooms.keys());
   io.emit("chatroomList", chatroomList);
 }
@@ -40,64 +37,87 @@ io.on("connection", client => {
   console.log("User connected:", client.id);
   users.set(client.id, null);
 
+// DRY
   client.on("getChatrooms", (_, callback) => {
-    let chatroomNames = Array.from(chatrooms.keys());
-    console.log('chatroom names:', chatroomNames);
-    return callback(chatroomNames);
+    const chatroomNames = Array.from(chatrooms.keys());
+    callback(chatroomNames);
   })
 
   // TODO: REFACTOR ME
   client.on("setChatroom", (currentRoomName, newRoomName, callback) => {
     let chatroomListChanged = false;
-    // leave current room
+
     if(currentRoomName === newRoomName){
       return callback(newRoomName);
     }
 
+    //// leave current room ////
     if(currentRoomName) {
+
+      // DRY
+      const content = `${users.get(client.id)} left the room.`;
+      client.to(currentRoomName).emit("message", {user: null, content});
       chatrooms.get(currentRoomName).delete(client.id);
+      client.leave(currentRoomName);
+      client.currentChatroom = null;
+
       if(chatrooms.get(currentRoomName).size === 0)
       {
-        console.log('deleting chatroom:', currentRoomName);
         chatrooms.delete(currentRoomName);
         chatroomListChanged = true;
       } else {
         sendUserList(currentRoomName);
       };
     }
-    // return null, user is leaving current room and not joining/creating another
+
+    //// handle create, join if applicable ////
+    // user not entering a room: return null
     if(!newRoomName){
       if(chatroomListChanged) {
-        sendChatroomList()
+        emitChatroomList()
       };
 
       return callback(null);
     }
-    // user is joining or creating a room, create the room if it doesn't exist
+
+    //// user creating new room: create room
     if(!chatroomExists(newRoomName)){
       chatrooms.set(newRoomName, new Map());
       chatroomListChanged = true;
     }
-    // join new room
-    chatrooms.get(newRoomName).set(client.id, users.get(client.id));
-    sendUserList(newRoomName);
 
-    if(chatroomListChanged) {
-      sendChatroomList()
-    };
+    //// add user to room
 
-    return callback(newRoomName);
+    client.join(newRoomName, () => {
+      chatrooms.get(newRoomName).set(client.id, users.get(client.id));
+      client.currentChatroom = newRoomName;
+      const content = `${users.get(client.id)} joined the room.`;
+      client.to(newRoomName).emit("message", {user: null, content});
+      sendUserList(newRoomName);
+
+      if(chatroomListChanged) {
+        emitChatroomList()
+      };
+
+      callback(newRoomName);
+    });
   })
 
   // TODO: REFACTOR ME
-  client.on("setUsername", (name, callback )=> {
-    const username = users.get(client.id);
-    if(!name || (name !== username && findName(name))) {
+  client.on("setUsername", (newName, oldName, chatroomName, callback )=> {
+    // console.log("newName:", newName);
+    // console.log("oldName:", oldName);
+    // console.log("chatroomName:", chatroomName);
+    // console.log("callback:", callback);
+
+    if(!newName || (newName !== oldName && findName(newName))) {
       return callback(null);
     } else {
-      console.log("setting name to:", name);
-      users.set(client.id, name);
-      return callback(name);
+      console.log("setting name to:", newName);
+      users.set(client.id, newName);
+      const content = `${oldName} changed name to ${newName}`;
+      client.to(chatroomName).emit("message", {user:null, content});
+      callback(newName);
     }
   })
 
@@ -105,27 +125,48 @@ io.on("connection", client => {
     if(chatroomExists(chatroomName)) {
       let userList = Array.from(chatrooms.get(chatroomName).values());
       return callback(userList);
+    } else {
+      callback(null);
     }
-
-    return callback(null);
   })
 
-  client.on("message", (message, chatroomName, callback) => {
-    console.log(`Received ${message} from ${users.get(client.id)} to ${chatroomName}`);
+  client.on("message", (content, chatroomName, callback) => {
+    const user = users.get(client.id)
+    console.log(`Received ${content} from ${user} to ${chatroomName}`);
 
-    const usersToMessage = chatrooms.get(chatroomName).keys();
+    // const usersToMessage = chatrooms.get(chatroomName).keys();
+    // for(let user of usersToMessage){
+    //   io.to(user).emit("message", message);
+    // }
 
-    for(let user of usersToMessage){
-      io.to(user).emit("message", message);
-    }
+    client.to(chatroomName).emit("message", {user, content});
 
-    return callback(message);
+    callback({user, content});
 
   })
 
   client.on("disconnect", () => {
     console.log("User disconnected:", client.id)
-    return users.delete(client.id);
+    console.log("was in room:", client.currentChatroom)
+
+    //DRY
+    const {currentChatroom} = client;
+
+    if(currentChatroom) {
+      const content = `${users.get(client.id)} left the room.`;
+      client.to(currentChatroom).emit("message", {user: null, content});
+      chatrooms.get(currentChatroom).delete(client.id);
+
+      if(chatrooms.get(currentChatroom).size === 0)
+      {
+        chatrooms.delete(currentChatroom);
+        chatroomListChanged = true;
+      } else {
+        sendUserList(currentChatroom);
+      };
+    }
+
+    users.delete(client.id);
   })
 
   //DEV
@@ -140,11 +181,17 @@ server.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
 });
 
+
+
+
+
+// userlist not being sent upon room join
+
 // TODO: refactor create/join/leave on client and server
 // TODO: Implement context for socket()
 // TODO: Error handling
 // TODO: create component for username - avoid re rendering App on username edit state
-// TODO: consider _ debounce on client updating chatroom/user info
+
 // TODO: validation
 
 // Stretch
