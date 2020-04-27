@@ -4,145 +4,149 @@ const io = require("socket.io")(server);
 const PORT = process.env.PORT || 5001;
 
 const users = new Map();
-const chatrooms = new Map();
+const rooms = new Map();
 
-const findName = name => {
-  console.log('in findName with:', name);
-  for(let [k, v] of users){
-    if(v && v.toLowerCase() === name.toLowerCase()){
-      return true;
-    }
-  }
-  return false;
-}
-
-const chatroomExists = chatroomName => {
-  return chatrooms.has(chatroomName);
-}
+/////////
 
 
-const sendUserList = chatroomName => {
-  const userList = Array.from(chatrooms.get(chatroomName).values());
-  console.log('emitting userList:', userList);
-  io.to(chatroomName).emit("userList", userList);
-}
-
-// DRY
-const emitChatroomList = () => {
-  const chatroomList = Array.from(chatrooms.keys());
-  io.emit("chatroomList", chatroomList);
-}
-
+//////////////////////////////////////////////////////////
 io.on("connection", client => {
-  console.log("User connected:", client.id);
-  users.set(client.id, null);
 
-// DRY
-  client.on("getChatrooms", (_, callback) => {
-    const chatroomNames = Array.from(chatrooms.keys());
-    callback(chatroomNames);
-  })
-
-  // TODO: REFACTOR ME
-  client.on("setChatroom", (currentRoomName, newRoomName, callback) => {
-    let chatroomListChanged = false;
-
-    if(currentRoomName === newRoomName){
-      return callback(newRoomName);
+  const nameExists = name => {
+    for(let [k, v] of users){
+      if(v.name && v.name.toLowerCase() === name.toLowerCase()){
+        return true;
+      }
     }
+    return false;
+  }
 
-    //// leave current room ////
-    if(currentRoomName) {
+  const roomExists = room => {
+    return rooms.has(room);
+  }
 
-      // DRY
-      const content = `${users.get(client.id)} left the room.`;
-      client.to(currentRoomName).emit("message", {user: null, content});
-      chatrooms.get(currentRoomName).delete(client.id);
-      client.leave(currentRoomName);
-      client.currentChatroom = null;
 
-      if(chatrooms.get(currentRoomName).size === 0)
-      {
-        chatrooms.delete(currentRoomName);
-        chatroomListChanged = true;
-      } else {
-        sendUserList(currentRoomName);
-      };
-    }
+  const emitUserList = room => {
+    console.log('emitting userlist to room:', room);
+    const userList = Array.from(rooms.get(room).values());
+    console.log('emitting userList:', userList);
+    io.to(room).emit("userList", userList);
+  }
 
-    //// handle create, join if applicable ////
-    // user not entering a room: return null
-    if(!newRoomName){
-      if(chatroomListChanged) {
-        emitChatroomList()
-      };
+  const emitRooms = () => {
+    const roomsList = Array.from(rooms.keys());
+    io.emit("rooms", roomsList);
+  }
 
+  const userLeaveRoom = (_, callback) => {
+
+    const {username, userRoom} = users.get(client.id);
+      if(userRoom) {
+        console.log('leaving rooms..');
+        const content = `${username} left the room.`;
+        client.to(userRoom).emit("message", {user: null, content});
+        client.leave(userRoom, () => {
+          console.log('in userLeaveroom:',rooms.get(userRoom));
+          rooms.get(userRoom).delete(client.id)
+          if(rooms.get(userRoom).size === 0)
+          {
+            rooms.delete(userRoom);
+            emitRooms(userRoom);
+          } else {
+            emitUserList(userRoom);
+          };
+          users.set(client.id, {username, userRoom: null});
+        });
+      }
+      callback ? callback("Done") : null;
+  }
+
+  const userJoinRoom = (room, callback) => {
+    const {username, userRoom} = users.get(client.id);
+
+    if(!roomExists(room)) {
       return callback(null);
     }
-
-    //// user creating new room: create room
-    if(!chatroomExists(newRoomName)){
-      chatrooms.set(newRoomName, new Map());
-      chatroomListChanged = true;
-    }
-
-    //// add user to room
-
-    client.join(newRoomName, () => {
-      chatrooms.get(newRoomName).set(client.id, users.get(client.id));
-      client.currentChatroom = newRoomName;
-      const content = `${users.get(client.id)} joined the room.`;
-      client.to(newRoomName).emit("message", {user: null, content});
-      sendUserList(newRoomName);
-
-      if(chatroomListChanged) {
-        emitChatroomList()
-      };
-
-      callback(newRoomName);
+    userLeaveRoom();
+    rooms.get(room).set(client.id, username);
+    users.set(client.id,{username, userRoom: room});
+    console.log('joining room..');
+    client.join(room, () => {
+      console.log('emitting userlist to:', room);
+      emitUserList(room);
     });
+    callback(room);
+  }
+
+  const userCreateRoom = (room, callback) => {
+    console.log('in createroom with 1 :', room);
+    const {username, userRoom} = users.get(client.id);
+
+    if(roomExists(room)) {
+      return callback(null);
+    }
+    userLeaveRoom();
+    console.log('in createroom with 2 :', room);
+    rooms.set(room, new Map());
+    rooms.get(room).set(client.id, username);
+    users.set(client.id, {username, userRoom: room});
+    console.log('in createroom with 3 :', room);
+    client.join(room, () => {
+      console.log('in createroom with 4 :', room);
+      emitUserList(room);
+    });
+    emitRooms();
+
+    callback(room);
+  }
+
+  console.log("User connected:", client.id);
+  users.set(client.id, {username: null, userRoom: null});
+  const {username, userRoom} = users.get(client.id);
+
+
+// DRY
+  client.on("getRooms", (_, callback) => {
+    const roomsArr = Array.from(rooms.keys());
+    callback(roomsArr);
   })
 
-  // TODO: REFACTOR ME
-  client.on("setUsername", (newName, oldName, chatroomName, callback )=> {
-    // console.log("newName:", newName);
-    // console.log("oldName:", oldName);
-    // console.log("chatroomName:", chatroomName);
-    // console.log("callback:", callback);
+  client.on("joinRoom", userJoinRoom);
 
-    if(!newName || (newName !== oldName && findName(newName))) {
+  client.on("leaveRoom", userLeaveRoom);
+
+  client.on("createRoom", userCreateRoom);
+
+
+  // TODO: REFACTOR ME
+  client.on("setUsername", (name, callback ) => {
+    const {username, userRoom} = users.get(client.id);
+
+    if(!name || nameExists(name)) {
       return callback(null);
     } else {
-      console.log("setting name to:", newName);
-      users.set(client.id, newName);
-      const content = `${oldName} changed name to ${newName}`;
-      client.to(chatroomName).emit("message", {user:null, content});
-      callback(newName);
+      const content = `${username} changed name to ${name}`;
+      client.to(userRoom).emit("message", {user:null, content});
+      users.set(client.id, {username: name, userRoom});
+      callback(name);
     }
   })
 
-  client.on("getUserList", (chatroomName, callback) => {
-    if(chatroomExists(chatroomName)) {
-      let userList = Array.from(chatrooms.get(chatroomName).values());
+  client.on("getUserList", (rooms, callback) => {
+    if(roomExists(room)) {
+      let userList = Array.from(rooms.get(room).values());
       return callback(userList);
     } else {
       callback(null);
     }
   })
 
-  client.on("message", (content, chatroomName, callback) => {
-    const user = users.get(client.id)
-    console.log(`Received ${content} from ${user} to ${chatroomName}`);
+  client.on("message", (content, callback) => {
+    const {username, userRoom} = users.get(client.id);
 
-    // const usersToMessage = chatrooms.get(chatroomName).keys();
-    // for(let user of usersToMessage){
-    //   io.to(user).emit("message", message);
-    // }
-
-    client.to(chatroomName).emit("message", {user, content});
-
-    callback({user, content});
-
+    console.log(`Received ${content} from ${username} to ${userRoom}`);
+    client.to(userRoom).emit("message", {username, content});
+    callback({username, content});
   })
 
   client.on("disconnect", () => {
@@ -150,21 +154,7 @@ io.on("connection", client => {
     console.log("was in room:", client.currentChatroom)
 
     //DRY
-    const {currentChatroom} = client;
-
-    if(currentChatroom) {
-      const content = `${users.get(client.id)} left the room.`;
-      client.to(currentChatroom).emit("message", {user: null, content});
-      chatrooms.get(currentChatroom).delete(client.id);
-
-      if(chatrooms.get(currentChatroom).size === 0)
-      {
-        chatrooms.delete(currentChatroom);
-        chatroomListChanged = true;
-      } else {
-        sendUserList(currentChatroom);
-      };
-    }
+    userLeaveRoom();
 
     users.delete(client.id);
   })
@@ -198,3 +188,65 @@ server.listen(PORT, () => {
 // emote
 // diceroll
 // esay
+
+
+
+
+  // client.on("setChatroom", (currentRoomName, newRoomName, callback) => {
+  //   let chatroomListChanged = false;
+  //
+  //   if(currentRoomName === newRoomName){
+  //     return callback(newRoomName);
+  //   }
+  //
+  //   //// leave current room ////
+  //   if(currentRoomName) {
+  //
+  //     // DRY
+  //     const content = `${users.get(client.id)} left the room.`;
+  //     client.to(currentRoomName).emit("message", {user: null, content});
+  //     chatrooms.get(currentRoomName).delete(client.id);
+  //     client.leave(currentRoomName);
+  //     client.currentChatroom = null;
+  //
+  //     if(chatrooms.get(currentRoomName).size === 0)
+  //     {
+  //       chatrooms.delete(currentRoomName);
+  //       chatroomListChanged = true;
+  //     } else {
+  //       emitUserList(currentRoomName);
+  //     };
+  //   }
+  //
+  //   //// handle create, join if applicable ////
+  //   // user not entering a room: return null
+  //   if(!newRoomName){
+  //     if(chatroomListChanged) {
+  //       emitChatroomList()
+  //     };
+  //
+  //     return callback(null);
+  //   }
+  //
+  //   //// user creating new room: create room
+  //   if(!chatroomExists(newRoomName)){
+  //     chatrooms.set(newRoomName, new Map());
+  //     chatroomListChanged = true;
+  //   }
+  //
+  //   //// add user to room
+  //
+  //   client.join(newRoomName, () => {
+  //     chatrooms.get(newRoomName).set(client.id, users.get(client.id));
+  //     client.currentChatroom = newRoomName;
+  //     const content = `${users.get(client.id)} joined the room.`;
+  //     client.to(newRoomName).emit("message", {user: null, content});
+  //     emitUserList(newRoomName);
+  //
+  //     if(chatroomListChanged) {
+  //       emitChatroomList()
+  //     };
+  //
+  //     callback(newRoomName);
+  //   });
+  // })

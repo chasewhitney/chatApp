@@ -4,11 +4,7 @@ import ChatWindow from "./ChatWindow";
 import UserList from "./UserList";
 
 export default props => {
-  const {client, chatroomName, leaveChatroom} = props;
-
-  const handleLeaveClick = () => {
-    leaveChatroom(null);
-  }
+  const {client, chatroomName} = props;
 
   if(chatroomName) {
     return (

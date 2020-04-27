@@ -5,29 +5,34 @@ export default props => {
   const chatroomCreateRef = useRef();
   let chatroomToJoin = '';
 
-  const {client, joinChatroom} = props;
+  const {client, joinRoom, createRoom} = props;
 
   useEffect(() => {
-    client.getChatrooms(setChatroomList);
-    client.listenForChatrooms(onChatroomUpdate);
+    client.getRooms(handleGetResponse);
+    client.listenForChatrooms(handleListUpdate);
     //DEV
     // setChatroomList(["RoomOne", "Two", "Three","RoomOne", "Two", "Three","RoomOne", "Two", "Three","RoomOne", "Two", "Three","RoomOne", "Two", "Three","RoomOne", "Two", "Three"]);
   }, []);
 
-  const onChatroomUpdate = chatroomList => {
+
+  const handleGetResponse = res => {
+    console.log('getChatroomsResponse:', res);
+    setChatroomList(res);
+  }
+  const handleListUpdate = chatroomList => {
     setChatroomList(chatroomList);
   }
 
   const handleListClick = (e, chatroomName) => {
     e.preventDefault();
-    joinChatroom(chatroomName);
+    joinRoom(chatroomName);
   }
 
   const handleCreateSubmit = e => {
     e.preventDefault();
     const roomName = chatroomCreateRef.current.value;
     // console.log('creating:', roomName);
-    joinChatroom(roomName);
+    createRoom(roomName);
     chatroomCreateRef.current.value = "";
   }
 

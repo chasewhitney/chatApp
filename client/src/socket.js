@@ -10,41 +10,55 @@ export default () => {
   })
 
   // EMITTERS
-  const getChatrooms = callback => {
-    socket.emit("getChatrooms", null, callback)
+  const getRooms = callback => {
+    console.log('getting chatrooms');
+    socket.emit("getRooms", null, callback)
   }
 
   const getUserList = (chatroomName, callback) => {
     socket.emit("getUserList", chatroomName, callback);
   }
 
-  const setUsername = (newName, currentName, chatroomName, callback) => {
-    socket.emit("setUsername", newName, currentName, chatroomName, callback);
+  const setUsername = (name, callback) => {
+    socket.emit("setUsername", name, callback);
   }
 
-  const sendMessage = (message, chatroomName, callback) => {
-    socket.emit("message", message, chatroomName, callback);
+  const sendMessage = (message, callback) => {
+    socket.emit("message", message, callback);
   }
 
-  const setChatroom = (currentRoom, newRoom, callback) => {
-    socket.emit("setChatroom", currentRoom, newRoom, callback);
+  const joinRoom = (name, callback) => {
+    socket.emit("joinRoom", name, callback);
   }
+
+  const leaveRoom = callback => {
+    socket.emit("leaveRoom", null, callback);
+  }
+
+  const createRoom = (name, callback) => {
+    socket.emit("createRoom", name, callback);
+  }
+
+  // const setChatroom = (currentRoom, newRoom, callback) => {
+  //   socket.emit("setChatroom", currentRoom, newRoom, callback);
+  // }
 
   // LISTENERS
   const listenForChatrooms = callback => {
-    socket.on('chatroomList', callback);
+    socket.on('rooms', callback);
   }
 
   const listenForMessages = callback => {
-    socket.on('message', callback)
+    socket.on('message', callback);
   }
 
   const listenForUserListUpdate = callback => {
+    console.log("listening for userlist");
     socket.on("userList", callback);
   }
 
   const listenForChatroomName = callback => {
-    socket.on("chatroomName", callback);
+    socket.on("roomName", callback);
   }
 
   // DEV
@@ -53,6 +67,6 @@ export default () => {
   }
   // END DEV
   return {
-    getUserList, getChatrooms, setUsername, sendMessage, setChatroom, listenForMessages, listenForUserListUpdate, listenForChatrooms, checkVars
+    getUserList, getRooms, setUsername, sendMessage, joinRoom, leaveRoom, createRoom, listenForMessages, listenForUserListUpdate, listenForChatrooms, checkVars
   }
 }

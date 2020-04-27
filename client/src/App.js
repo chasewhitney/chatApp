@@ -17,7 +17,7 @@ const App = props => {
   useEffect(() => {
     console.log("APP MOUNT");
     // console.log('username:', username);
-    client.setUsername(username, null, chatroomName, changeUsername);
+    client.setUsername(username, changeUsername);
     // client.listenForChatroomName(handleChatroomChange);
 
     // //DEV MOUNT
@@ -27,11 +27,35 @@ const App = props => {
 
   const handleLeaveClick = e => {
     e.preventDefault();
-    client.setChatroom(chatroomName, null, handleSetChatroomResponse);
+    client.leaveRoom(handleLeaveResponse);
+  }
+
+  const handleLeaveResponse = res => {
+    console.log('leave res:', res);
+    setChatroomName("");
+  }
+
+  const handleJoinRoom = room => {
+    client.joinRoom(room, handleJoinResponse);
+  }
+
+  const handleJoinResponse = res => {
+    console.log('join res:', res);
+    if(res) setChatroomName(res);
+  }
+
+  const handleCreateRoom = room => {
+    client.createRoom(room, handleCreateResponse);
+  }
+
+  const handleCreateResponse = res => {
+    console.log('create res:', res);
+    if(res) setChatroomName(res);
   }
 
   const handleChatroomChange = newChatroomName => {
     // console.log(`Changing rooms from ${chatroomName} to ${newChatroomName}`);
+    if(chatroomName === newChatroomName) return;
     client.setChatroom(chatroomName, newChatroomName, handleSetChatroomResponse);
     // setUsernameInHeader(true);
   }
@@ -56,10 +80,11 @@ const App = props => {
       setIsEditing(false);
     }
 
-    client.setUsername(newName, username, chatroomName, changeUsername);
+    client.setUsername(newName, changeUsername);
   }
 
   const changeUsername = name => {
+    console.log("name:", name);
     if(name) {
       setUsername(name);
       setIsEditing(false);
@@ -101,8 +126,8 @@ const App = props => {
         {!chatroomName ? null : <div className="header-username-container">{renderUsernameContent()}</div>}
       </div>
       <div className="main">
-        <ChatroomList client={client} joinChatroom={handleChatroomChange}/>
-        <Chatroom client={client} chatroomName={chatroomName} leaveChatroom={handleChatroomChange}/>
+        <ChatroomList client={client} joinRoom={handleJoinRoom} createRoom={handleCreateRoom}/>
+        <Chatroom client={client} chatroomName={chatroomName}/>
         {chatroomName ? null : <div className="main-noChatroom"><div className="main-noChatroom-hello">Hello,</div>{renderUsernameContent()}<div className="main-noChatroom-click">Click to change</div></div>}
       </div>
       <div className="footer">IMA FOOTER</div>
