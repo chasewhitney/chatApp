@@ -15,8 +15,8 @@ export default () => {
     socket.emit("getRooms", null, callback)
   }
 
-  const getUserList = (chatroomName, callback) => {
-    socket.emit("getUserList", chatroomName, callback);
+  const getUserList = callback => {
+    socket.emit("getUserList", null, callback);
   }
 
   const setUsername = (name, callback) => {

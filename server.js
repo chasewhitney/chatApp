@@ -22,9 +22,9 @@ io.on("connection", client => {
   }
 
   const roomExists = room => {
-    return rooms.has(room);
+    const roomsArr = Array.from(rooms.keys());
+    return !roomsArr.every((roomItem) => roomItem.toLowerCase() != room.toLowerCase());
   }
-
 
   const emitUserList = room => {
     console.log('emitting userlist to room:', room);
@@ -128,13 +128,15 @@ io.on("connection", client => {
       const content = `${username} changed name to ${name}`;
       client.to(userRoom).emit("message", {user:null, content});
       users.set(client.id, {username: name, userRoom});
+      console.log('users:', users);
       callback(name);
     }
   })
 
-  client.on("getUserList", (rooms, callback) => {
-    if(roomExists(room)) {
-      let userList = Array.from(rooms.get(room).values());
+  client.on("getUserList", (_, callback) => {
+    const {userRoom} = users.get(client.id);
+    if(userRoom) {
+      const userList = Array.from(rooms.get(userRoom).values());
       return callback(userList);
     } else {
       callback(null);
@@ -175,7 +177,7 @@ server.listen(PORT, () => {
 
 
 
-// userlist not being sent upon room join
+// client not getting userlist upon room creation, userlist component possibly not rendered soon enough
 
 // TODO: refactor create/join/leave on client and server
 // TODO: Implement context for socket()

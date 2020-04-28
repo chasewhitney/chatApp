@@ -7,11 +7,13 @@ export default props => {
 
   useEffect( () => {
     client.listenForUserListUpdate(handleUserListUpdate);
+    client.getUserList(handleGetUsersResponse);
   }, [])
 
   const handleUserListUpdate = userList => {
     console.log('got userlist:', userList);
-    setUsers(userList);
+    if(userList) setUsers(userList);
+    else console.log("Something went wrong getting userlist");
   }
 
   const handleGetUsersResponse = res => {
