@@ -6,7 +6,7 @@ import Chatroom from "./Chatroom";
 
 
 const App = props => {
-  const [ username, setUsername ] = useState( "GUEST-" + Math.ceil( Math.random() * 999999 ) );
+  const [ username, setUsername ] = useState(null);
   const [ isEditingUsername, setIsEditing ] = useState(false);
   const [ chatroomName, setChatroomName] = useState('');
   // const [ usernameInHeader, setUsernameInHeader] = useState(false);
@@ -16,82 +16,67 @@ const App = props => {
 
   useEffect(() => {
     console.log("APP MOUNT");
-    // console.log('username:', username);
-    client.setUsername(username, changeUsername);
-    // client.listenForChatroomName(handleChatroomChange);
-
-    // //DEV MOUNT
-    // setChatroomName("DEV-ROOM");
-
+    client.registerUser(handleUsernameResponse);
   },[])
 
-  const handleLeaveClick = e => {
-    e.preventDefault();
-    client.leaveRoom(handleLeaveResponse);
+  const handleRoomChangeResponse = res => {
+    if(res && res.error) {
+      console.log('Something went wrong on the server setting chatroom..');
+      alert(res.error);
+    }
+    if(res && res.message) {
+      console.log("Couldn't update room:", res.message);
+      alert(res.message)
+    } else {
+      console.log('Room set to:', res);
+      setChatroomName(res);
+    }
+
   }
 
-  const handleLeaveResponse = res => {
-    console.log('leave res:', res);
-    setChatroomName("");
+  const handleLeave = e => {
+    e.preventDefault();
+    if(chatroomName) {
+      client.leaveRoom(handleRoomChangeResponse);
+    }
   }
 
   const handleJoinRoom = room => {
-    client.joinRoom(room, handleJoinResponse);
-  }
-
-  const handleJoinResponse = res => {
-    console.log('join res:', res);
-    if(res) setChatroomName(res);
+    if(room.toLowerCase() === chatroomName.toLowerCase()){
+      alert("You are already in that room.");
+    }
+    client.joinRoom(room, handleRoomChangeResponse);
   }
 
   const handleCreateRoom = room => {
-    client.createRoom(room, handleCreateResponse);
+    if(chatroomName && room.toLowerCase() === chatroomName.toLowerCase()){
+      alert("You are already in that room.");
+    }
+    client.createRoom(room, handleRoomChangeResponse);
   }
-
-  const handleCreateResponse = res => {
-    console.log('create res:', res);
-    if(res) setChatroomName(res);
-  }
-
-  const handleChatroomChange = newChatroomName => {
-    // console.log(`Changing rooms from ${chatroomName} to ${newChatroomName}`);
-    if(chatroomName === newChatroomName) return;
-    client.setChatroom(chatroomName, newChatroomName, handleSetChatroomResponse);
-    // setUsernameInHeader(true);
-  }
-
-  const handleSetChatroomResponse = res => {
-    // console.log('setting chatroom to:', res);
-    setChatroomName(res);
-  }
-
-  // DEV
-  const myTestFunc = () => {
-    client.checkVars();
-  }
-  // END DEV
 
   const tryUsernameChange = e => {
     e.preventDefault();
     const newName = usernameEditRef.current.value;
 
-    if(newName === username){
-      // console.log('name unchanged');
-      setIsEditing(false);
+    if(newName !== username){
+      client.changeUsername(newName, handleUsernameResponse);
     }
 
-    client.setUsername(newName, changeUsername);
+    setIsEditing(false);
   }
 
-  const changeUsername = name => {
-    console.log("name:", name);
-    if(name) {
-      setUsername(name);
-      setIsEditing(false);
+  const handleUsernameResponse = res => {
+    if(res.error) {
+      console.log('Something went wrong on the server setting username');
+      alert(res.error);
     }
-    else {
-      alert("Username in use. Try a different username.");
-      // console.log('NAME CHANGE FAILED');
+    if(res.message) {
+      console.log("Couldn't update username:", res.message);
+      alert(res.message)
+    } else {
+      console.log('Username set to:', res);
+      setUsername(res);
     }
   }
 
@@ -116,19 +101,29 @@ const App = props => {
     }
   }
 
+  const myTestFunc = () => {
+    client.checkVars();
+  }
+
   return (
     <div className="App-container">
       <div className="header-container">
-        <div className="header-title"><span>CHAT APP</span></div>
-        <div className="header-chatroomName">
-          {chatroomName}<button onClick={handleLeaveClick}>Leave</button>
+        <div className="header-title">          
+          <span>CHAT APP</span>
         </div>
-        {!chatroomName ? null : <div className="header-username-container">{renderUsernameContent()}</div>}
+
+        <div className="header-username-container">{renderUsernameContent()}</div>
       </div>
       <div className="main">
-        <ChatroomList client={client} joinRoom={handleJoinRoom} createRoom={handleCreateRoom}/>
-        <Chatroom client={client} chatroomName={chatroomName}/>
-        {chatroomName ? null : <div className="main-noChatroom"><div className="main-noChatroom-hello">Hello,</div>{renderUsernameContent()}<div className="main-noChatroom-click">Click to change</div></div>}
+        <ChatroomList client={client} joinRoom={handleJoinRoom} createRoom={handleCreateRoom} currentRoom={chatroomName}/>
+        <Chatroom client={client} username={username} chatroomName={chatroomName} handleLeaveClick={handleLeave}/>
+
+        { chatroomName ? null :
+          <div className="main-noChatroom">
+            <div className="main-noChatroom-username">Click your username in the upper right to change it</div>
+            <div className="main-noChatroom-rooms">Create or join a room on the left</div>
+          </div>
+        }
       </div>
       <div className="footer">IMA FOOTER</div>
     </div>

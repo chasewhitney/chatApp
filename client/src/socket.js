@@ -10,8 +10,12 @@ export default () => {
   })
 
   // EMITTERS
+
+  const registerUser = callback => {
+    socket.emit("registerUser", null, callback);
+  }
+
   const getRooms = callback => {
-    console.log('getting chatrooms');
     socket.emit("getRooms", null, callback)
   }
 
@@ -19,8 +23,8 @@ export default () => {
     socket.emit("getUserList", null, callback);
   }
 
-  const setUsername = (name, callback) => {
-    socket.emit("setUsername", name, callback);
+  const changeUsername = (name, callback) => {
+    socket.emit("changeUsername", name, callback);
   }
 
   const sendMessage = (message, callback) => {
@@ -39,27 +43,41 @@ export default () => {
     socket.emit("createRoom", name, callback);
   }
 
-  // const setChatroom = (currentRoom, newRoom, callback) => {
-  //   socket.emit("setChatroom", currentRoom, newRoom, callback);
-  // }
-
   // LISTENERS
   const listenForChatrooms = callback => {
+    console.log('Listening for chatrooms');
     socket.on('rooms', callback);
   }
 
   const listenForMessages = callback => {
+    console.log('Listening for messages');
     socket.on('message', callback);
   }
 
   const listenForUserListUpdate = callback => {
-    console.log("listening for userlist");
+    console.log("Listening for userList");
     socket.on("userList", callback);
   }
 
-  const listenForChatroomName = callback => {
-    socket.on("roomName", callback);
+  // REMOVE LISTENERS
+  const stopListeningRooms = () => {
+    console.log('Stopped listening for chatrooms');
+    socket.removeAllListeners('rooms');
   }
+
+  const stopListeningMessages = () => {
+    console.log('Stopped listening for messages');
+    socket.removeAllListeners('message');
+  }
+
+  const stopListeningUserList = () => {
+    console.log('Stopped listening for userList');
+    socket.removeAllListeners('userList');
+  }
+
+  // const listenForChatroomName = callback => {
+  //   socket.on("roomName", callback);
+  // }
 
   // DEV
   const checkVars = () => {
@@ -67,6 +85,6 @@ export default () => {
   }
   // END DEV
   return {
-    getUserList, getRooms, setUsername, sendMessage, joinRoom, leaveRoom, createRoom, listenForMessages, listenForUserListUpdate, listenForChatrooms, checkVars
+    registerUser, getRooms, getUserList, changeUsername, sendMessage, joinRoom, leaveRoom, createRoom, listenForChatrooms, listenForMessages, listenForUserListUpdate, stopListeningRooms, stopListeningMessages, stopListeningUserList, checkVars
   }
 }

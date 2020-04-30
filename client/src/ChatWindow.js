@@ -1,9 +1,11 @@
 import React, {useState, useEffect, useRef} from "react";
 
 export default props => {
+  const [usernameSet, setUsernameSet] = useState(false);
   const [chatLog, setChatLog] = useState([]);
   const chatInputRef = useRef();
-  const {client, chatroomName} = props;
+  const {client, chatroomName, username} = props;
+
 
   //DEV
   // const devLog = [{user:"STARTER", content:"TOPMOST ITEM"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:null, content: "This is a server message"},{user:null, content: "This is a server message"},{user:null, content: "This is a server message"},{user:"BOTTOM", content:"BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM "}];
@@ -14,8 +16,18 @@ export default props => {
   }
 
   useEffect(() => {
+    addEntry({username:null, content:`You joined ${chatroomName}`});
     client.listenForMessages(addEntry);
+    setUsernameSet(true);
+
+    return () => client.stopListeningMessages();
   }, []);
+
+  useEffect(() =>{
+    if(usernameSet) {
+      addEntry({username: null, content: `Changed name to ${username}`});
+    }
+  }, [username]);
 
   const handleChatSubmit = e => {
     e.preventDefault();
@@ -53,7 +65,7 @@ export default props => {
         {renderChatLog()}
       </div>
       <form>
-        <input className="chatWindow-inputBar" type="text" ref={chatInputRef} /><button type="submit" onClick={handleChatSubmit}>Send</button>
+        <input className="chatWindow-inputBar" type="text" ref={chatInputRef} /><button hidden={true} type="submit" onClick={handleChatSubmit}>Send</button>
       </form>
     </>
   )

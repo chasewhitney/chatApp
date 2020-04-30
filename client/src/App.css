@@ -1,5 +1,10 @@
-html {
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
+}
+
+html {
   font-size: 62.5%;
 }
 
@@ -16,6 +21,10 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  max-width: 90%;
+  margin: auto;
+  border-right: 1px solid gray;
+  border-left: 1px solid gray;
 }
 
 .header-container {
@@ -24,22 +33,16 @@ body {
   align-items: stretch;
   background-color: #242529;
   /* background-color: black; */
+  border-bottom: 1px solid gray;
 }
 
 .header-title {
   font-size: 3rem;
   min-width: 25rem;
   text-align: center;
-  border-right: 1px solid white;
-  /* background-color: grey; */
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.header-chatroomName {
-  font-size: 5rem;
-  background-color: blue;
 }
 
 .header-username-container{
@@ -48,6 +51,7 @@ body {
   align-items: flex-end;
   /* background-color: gray; */
   padding: 1rem;
+  margin-right: 1rem;
 }
 
 .header-username-label {
@@ -64,6 +68,11 @@ body {
   border: 1px solid white;
   border-radius: 3px;
   padding: .25rem 1rem;
+  background-color: black;
+}
+
+.header-username-name:hover {
+  background-color: gray;
 }
 
 .header-username-change {
@@ -93,30 +102,34 @@ body {
 }
 
 
-.main-noChatroom-hello {
-
+.main-noChatroom-username {
+  padding: 1rem;
 }
 
-.main-noChatroom-click {
-
+.main-noChatroom-rooms {
+  padding: 1rem;
 }
+
 .chatroomList-container {
   /* background-color: grey; */
   /* height: 100%; */
   display: flex;
   flex-direction: column;
   border-right: 1px solid white;
+  font-family: "Roboto Condensed";
+  font-size: 2.5rem;
+  border-bottom: 1px solid gray;
 }
 
 .chatroomList-header {
   background-color: green;
 }
 
-.chatroomList-content {
-  background-color: blue;
-  max-height: 50%;
+.chatroomList-list {
+  min-height: 50%;
   width: 25rem;
   overflow-y: auto;
+  border-bottom: 1px solid gray;
 }
 
 .chatroomList-itemContainer {
@@ -124,7 +137,7 @@ body {
 }
 
 .chatroomList-noItems {
-
+ padding: 1rem;
 }
 
 .chatroomList-item {
@@ -134,11 +147,11 @@ body {
 
 .chatroomList-item:hover {
   cursor: pointer;
-  background-color:pink;
+  background-color:gray;
 }
 
 .chatroomList-inputs {
-  background-color: red;
+  padding: 1rem;
   flex: 1;
 }
 
@@ -162,11 +175,53 @@ body {
 
 
 .chatWindow-container {
-  /* background-color: pink; */
   flex-grow: 1;
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.chatWindow-header {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  /* background-color: gray; */
+  border-bottom: 1px solid gray;
+  border-right: 1px solid gray;
+}
+
+.chatWindow-header-name {
+  font-size: 3.5rem;
+}
+
+
+.chatWindow-header-leave {
+  margin: 0;
+  margin-right: .2rem;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+  font-family: "Roboto";
+  font-size: 3rem;
+  height: 3rem;
+  width: 3rem;
+  border: 2px solid white;
+  border-radius: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.chatWindow-header-leave span {
+  color: cyan;
+}
+
+.chatWindow-header-leave span:hover {
+  color: red;
 }
 
 .chatWindow-chatLog {
@@ -175,31 +230,37 @@ body {
   overflow-y: scroll;
   padding: 1rem;
   justify-content: flex-start;
-  font-family: "Roboto";
-}
-
-.chatWindow-inputBar {
-  background-color: cyan;
-  width: 100%;
-  height: 100%;
-  font-size: 3rem;
+  font-family: "Roboto Condensed";
 }
 
 .chat-item{
- width: 100%;
+ max-width: 100%;
  /* background-color: pink; */
  text-align: left;
  padding: .25rem;
  display: flex;
+ font-size: 2.2rem;
 }
 
-.chat-item-sender{
-  font-weight:bold;
+.chat-item-sender {
+  font-weight: bold;
   color: yellow;
   margin-right: 1rem;
+  flex-shrink: 0;
 }
-.chat-item-content{}
 
+.chat-item-content {
+  overflow-wrap: anywhere;
+}
+
+.chatWindow-inputBar {
+  background-color: white;
+  width: 100%;
+  height: 5rem;
+  font-size: 2.5rem;
+  border: none;
+  padding: 1rem;
+}
 .chat-serverMessage{
   font-style:italic;
   width: 100%;
@@ -210,20 +271,19 @@ body {
 }
 
 .userList-container {
-  background-color: magenta;
   height: 100%;
-
   display: flex;
   flex-direction: column;
 }
 
 .userList-header {
-  background-color: green;
+  /* background-color: green; */
+    border-bottom: 1px solid gray;
 }
 
 .userList-content {
   width: 25rem;
-  background-color: blue;
+  /* background-color: blue; */
   flex-grow: 1;
   display: flex;
   flex-direction: column;

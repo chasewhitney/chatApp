@@ -8,6 +8,8 @@ export default props => {
   useEffect( () => {
     client.listenForUserListUpdate(handleUserListUpdate);
     client.getUserList(handleGetUsersResponse);
+
+    return () => client.stopListeningUserList();
   }, [])
 
   const handleUserListUpdate = userList => {
@@ -27,16 +29,9 @@ export default props => {
     )
   }
 
-
-
-  // useEffect(() => {
-  //   console.log('hit userlist Effect');
-  // })
-
-  // console.log("Rendering userlist");
-  return (
+return (
     <div className="userList-container">
-      <div className="userList-header">Users</div>
+      <div className="userList-header">Online</div>
       <div className="userList-content">{renderUserList()}</div>
     </div>
   )
