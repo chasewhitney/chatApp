@@ -25,14 +25,14 @@ export default props => {
 
   const renderUserList = () => {
     return (
-      <>{users.map(user => <div className="userList-item" key={user}>{user}</div>)}</>
+      <>{users.map(user => <div className="userList__item" key={user}>{user}</div>)}</>
     )
   }
 
 return (
-    <div className="userList-container">
-      <div className="userList-header">Online</div>
-      <div className="userList-content">{renderUserList()}</div>
+    <div className="chatroom__userList">
+      <div className="userList__header">Online</div>
+      <div className="userList__content">{renderUserList()}</div>
     </div>
   )
 }

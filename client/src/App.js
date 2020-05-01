@@ -59,6 +59,10 @@ const App = props => {
     e.preventDefault();
     const newName = usernameEditRef.current.value;
 
+    if(newName.length > 22){
+      return alert("Maximum name length is 22 characters");
+    }
+
     if(newName !== username){
       client.changeUsername(newName, handleUsernameResponse);
     }
@@ -89,15 +93,15 @@ const App = props => {
     if(isEditingUsername) {
       return (
         <>
-          <form className="header-username-form">
-            <input className="header-username-input" ref={usernameEditRef} defaultValue={username}/>
-            <button type="submit" className="header-username-ok" onClick={tryUsernameChange}>OK</button>
-            <button className="header-username-cancel" onClick={handleCancelClick}>Cancel</button>
+          <form className="header__username__form">
+            <input className="header__username__input" ref={usernameEditRef} defaultValue={username}/>
+            <button type="submit" className="header__username__ok" onClick={tryUsernameChange}>OK</button>
+            <button className="header__username__cancel" onClick={handleCancelClick}>Cancel</button>
           </form>
         </>
       )
     } else {
-      return <div onClick={() => setIsEditing(true)} className="header-username-name">{username}</div>
+      return <div onClick={() => setIsEditing(true)} className="header__username__name">{username}</div>
     }
   }
 
@@ -106,26 +110,26 @@ const App = props => {
   }
 
   return (
-    <div className="App-container">
-      <div className="header-container">
-        <div className="header-title">          
+    <div className="App__container">
+      <div className="header__container">
+        <div className="header__title">
           <span>CHAT APP</span>
         </div>
 
-        <div className="header-username-container">{renderUsernameContent()}</div>
+        <div className="header__username__container">{renderUsernameContent()}</div>
       </div>
       <div className="main">
         <ChatroomList client={client} joinRoom={handleJoinRoom} createRoom={handleCreateRoom} currentRoom={chatroomName}/>
         <Chatroom client={client} username={username} chatroomName={chatroomName} handleLeaveClick={handleLeave}/>
 
         { chatroomName ? null :
-          <div className="main-noChatroom">
-            <div className="main-noChatroom-username">Click your username in the upper right to change it</div>
-            <div className="main-noChatroom-rooms">Create or join a room on the left</div>
+          <div className="main__noChatroom">
+            <div className="main__noChatroom__username">Click your username in the upper right to change it</div>
+            <div className="main__noChatroom__rooms">Create or join a room on the left</div>
           </div>
         }
       </div>
-      <div className="footer">IMA FOOTER</div>
+      <div className="footer">© 2020 Chase Whitney. All Rights Reserved.</div>
     </div>
   );
 };

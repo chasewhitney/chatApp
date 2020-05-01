@@ -83,6 +83,10 @@ io.on("connection", client => {
 
 
   const userCreateRoom = (room, callback) => {
+    if(room.length > 27) {
+      callback(null);
+    }
+
     const {username, userRoom} = users.get(client.id);
 
     if(roomExists(room)) {
@@ -127,11 +131,10 @@ io.on("connection", client => {
   client.on("createRoom", userCreateRoom);
 
   client.on("changeUsername", (name, callback ) => {
-    const {username, userRoom} = users.get(client.id);
-
-    if(!name || nameExists(name)) {
+    if(!name || nameExists(name) || name.length > 22) {
       callback({message:"Name is taken or invalid. Try another name."});
     } else {
+          const {username, userRoom} = users.get(client.id);
       users.set(client.id, {username: name, userRoom});
       if(userRoom) {
         const content = `${username} changed name to ${name}`;
@@ -186,8 +189,7 @@ server.listen(PORT, () => {
 
 
 
-// TODO: (FIX) creating a new room while in an existing room does not reset/update the chatlog or the userlist
-// TODO: (FIX) chatlog stretches div vertically when window fills
+
 // TODO: chatLog should scroll to bottom after each message when window is full
 
 

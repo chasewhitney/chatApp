@@ -35,6 +35,9 @@ export default props => {
   const handleCreateSubmit = e => {
     e.preventDefault();
     const roomName = chatroomCreateRef.current.value;
+    if(roomName.length > 27) {
+      return alert("Maximum name length is 27 characters");
+    }
     // console.log('creating:', roomName);
     createRoom(roomName);
     chatroomCreateRef.current.value = "";
@@ -47,21 +50,23 @@ export default props => {
   const renderChatrooms = () => {
     if(chatroomList.length > 0)
     {
-      return <div className="chatroomList-itemsContainer">{chatroomList.map(chatroomName => <div onClick={(e) => handleListClick(e, chatroomName)} key={chatroomName} className="chatroomList-item">{chatroomName}</div>)}</div>
+      return <div className="chatroomsList__content">{chatroomList.map(chatroomName => <div onClick={(e) => handleListClick(e, chatroomName)} key={chatroomName} className="chatroomsList__item">{chatroomName}</div>)}</div>
     } else {
-      return <div className="chatroomList-noItems">No lobbies found</div>
+      return <div className="chatroomsList__noItems">No lobbies found</div>
     }
   }
 
   // console.log('rendering ChatroomList');
   return (
-          <div className="chatroomList-container">
-
-            <div className="chatroomList-list">{renderChatrooms()}</div>
-            <div className="chatroomList-inputs">
+          <div className="chatroomsNav">
+            <div className="chatroomsNav__chatroomsList">
+            <div className="chatroomsList__header">Lobbies</div>
+            {renderChatrooms()}
+            </div>
+            <div className="chatroomsNav__createChatroom">
               <div>(Click to join)</div>
               <div>or</div>
-              <form className="chatList-form"><input className="chatroomList-textInput" type="text" ref={chatroomCreateRef}/ ><button className="chatroomList-submit" onClick={handleCreateSubmit}>CREATE</button></form>
+              <form className="createChatroom__form"><input className="createChatroom__textInput" type="text" ref={chatroomCreateRef}/ ><button className="createChatroom__submit" onClick={handleCreateSubmit}>CREATE</button></form>
             </div>
           </div>
   )

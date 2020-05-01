@@ -12,11 +12,11 @@ export default props => {
 
   if(chatroomName) {
     return (
-      <div className="chatroom-container">
-        <div className="chatWindow-container">
-          <div className="chatWindow-header">
-            <div className="chatWindow-header-name">{chatroomName}</div>
-            <div className="chatWindow-header-leave" onClick={handleLeaveClick}><span>X</span></div>
+      <div className="chatroom">
+        <div className="chatroom__chatWindow">
+          <div className="chatWindow__header">
+            <div className="chatWindow__header-name">{chatroomName}</div>
+            <div className="chatWindow__header-leave" onClick={handleLeaveClick}><span>X</span></div>
           </div>
           <ChatWindow client={client} chatroomName={chatroomName} username={username}/>
         </div>
