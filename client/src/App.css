@@ -47,6 +47,7 @@ body {
   width: 90%;
   margin: 0 auto;
   height: 100vh;
+  min-height: 40rem;
 }
 
 .header__container {
@@ -119,6 +120,7 @@ body {
   border: 1px solid gray;
   width: 100%;
   height: calc(100% - 14rem);
+  min-width: 85rem;
 }
 
 .main__noChatroom {
@@ -143,21 +145,10 @@ body {
   width: 25rem;
 }
 
-/* .chatroomsNav__chatroomsList {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  min-height: 50%;
-  overflow-y: auto;
-  border-bottom: 1px solid gray;
-  width: 100%;
-  padding: 1rem;
-} */
-
 .chatroomsNav__chatroomsList {
   overflow-y: auto;
   width: 100%;
-  flex: 1;
+  min-height: 15rem;
 }
 
 .chatroomsList__header {
@@ -214,6 +205,7 @@ body {
 .chatroomsNav__createChatroom {
   border-top: 1px solid gray;
   padding: 1rem;
+  flex: 1;
 }
 
 .createChatroom__textInput {
@@ -234,6 +226,7 @@ body {
   display: flex;
   flex: 1;
   width: calc(100% - 25rem);
+  min-width: 60rem;
 }
 
 
@@ -245,6 +238,7 @@ body {
   background-color: #2d2e33;
   width: calc(100% - 20rem);
   border-right: 1px solid gray;
+  min-width: 40rem;
 }
 
 .chatWindow__header {
@@ -259,6 +253,7 @@ body {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  min-width: inherit;
 }
 
 .chatWindow__header-name {

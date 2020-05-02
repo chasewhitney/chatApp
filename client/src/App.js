@@ -115,13 +115,11 @@ const App = props => {
         <div className="header__title">
           <span>CHAT APP</span>
         </div>
-
         <div className="header__username__container">{renderUsernameContent()}</div>
       </div>
       <div className="main">
         <ChatroomList client={client} joinRoom={handleJoinRoom} createRoom={handleCreateRoom} currentRoom={chatroomName}/>
         <Chatroom client={client} username={username} chatroomName={chatroomName} handleLeaveClick={handleLeave}/>
-
         { chatroomName ? null :
           <div className="main__noChatroom">
             <div className="main__noChatroom__username">Click your username in the upper right to change it</div>
