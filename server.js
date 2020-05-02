@@ -1,14 +1,26 @@
-const server = require("http").createServer();
+const express = require("express");
+const app = express();
+const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 
 const PORT = process.env.PORT || 5001;
+
 
 const users = new Map();
 const rooms = new Map();
 
 
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("client/build"));
+
+  const path = require("path");
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
+}
+
 io.on("connection", client => {
-  console.log("User connected:", client.id);
+  // console.log("User connected:", client.id);
   users.set(client.id, {username: null, userRoom: null});
 
   //// HELPERS /////////////////
@@ -28,15 +40,15 @@ io.on("connection", client => {
   }
 
   const emitUserList = room => {
-    console.log('emitting userlist to room:', room);
+    // console.log('emitting userlist to room:', room);
     const userList = Array.from(rooms.get(room).values());
-    console.log('emitting userList:', userList);
+    // console.log('emitting userList:', userList);
     io.to(room).emit("userList", userList);
   }
 
   const emitRooms = () => {
     const roomsList = Array.from(rooms.keys());
-    console.log('emitting rooms with:', roomsList);
+    // console.log('emitting rooms with:', roomsList);
     io.emit("rooms", roomsList);
   }
 
@@ -70,7 +82,7 @@ io.on("connection", client => {
     const room = rooms.get(roomName);
     room.set(client.id, username);
     users.set(client.id, {username, userRoom: roomName});
-    console.log('joining room..');
+    // console.log('joining room..');
     client.join(roomName, () => {
       const content = `${username} joined the room.`;
       client.to(roomName).emit("message", {user: null, content});
@@ -94,7 +106,7 @@ io.on("connection", client => {
     users.set(client.id, {username, userRoom: room});
 
     client.join(room, () => {
-      console.log('in createroom with, about to send rooms..');
+      // console.log('in createroom with, about to send rooms..');
       emitRooms();
       callback(room);
     });
@@ -157,47 +169,27 @@ io.on("connection", client => {
       return callback(null);
     }
     const {username, userRoom} = users.get(client.id);
-    console.log(`Received ${content} from ${username} to ${userRoom}`);
+    // console.log(`Received ${content} from ${username} to ${userRoom}`);
     client.to(userRoom).emit("message", {username, content});
     callback({username, content});
   })
 
   client.on("disconnect", () => {
-    console.log("User disconnected:", client.id)
-    console.log("was in room:", client.currentChatroom)
+    // console.log("User disconnected:", client.id)
+    // console.log("was in room:", client.currentChatroom)
 
     userLeaveRoom();
     users.delete(client.id);
   })
 
 
-  client.on("checkVars", (_, callback) => {
-    console.log('users:', users );
-    console.log('rooms:', rooms );
-  })
+  // client.on("checkVars", (_, callback) => {
+  //   console.log('users:', users );
+  //   console.log('rooms:', rooms );
+  // })
 
 });
 
 server.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}`);
-});
-
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static("client/build"));
-
-  const path = require("path");
-  app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
-  });
-}
-
-
-
-
-// TODO: chatLog should scroll to bottom after each message when window is full
-
-
-// Stretch
-// emote
-// diceroll
-// esay
+  console.log("Listening on port", PORT);
+})

@@ -1,11 +1,13 @@
 import io from "socket.io-client";
 
 export default () => {
-  if(process.env.NODE_ENV === "production"){
-    
-  }
-  const endpoint = "http://localhost:5001";
-  const socket = io(endpoint);
+  const endpoint =
+    process.env.NODE_ENV === "production"
+      ? window.location.hostname
+      : "http://localhost:5001";
+
+
+  const socket = io(endpoint, {secure: true});
 
   socket.on("tempError", err => {
     console.log("Error:", err);
