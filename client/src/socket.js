@@ -1,6 +1,9 @@
 import io from "socket.io-client";
 
 export default () => {
+  if(process.env.NODE_ENV === "production"){
+    
+  }
   const endpoint = "http://localhost:5001";
   const socket = io(endpoint);
 

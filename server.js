@@ -83,16 +83,11 @@ io.on("connection", client => {
 
 
   const userCreateRoom = (room, callback) => {
-    if(room.length > 27) {
-      callback(null);
-    }
-
-    const {username, userRoom} = users.get(client.id);
-
-    if(roomExists(room)) {
+    if(room.length > 27 || roomExists(room)) {
       return callback(null);
     }
 
+    const {username, userRoom} = users.get(client.id);
     userLeaveRoom();
     rooms.set(room, new Map());
     rooms.get(room).set(client.id, username);
@@ -132,7 +127,7 @@ io.on("connection", client => {
 
   client.on("changeUsername", (name, callback ) => {
     if(!name || nameExists(name) || name.length > 22) {
-      callback({message:"Name is taken or invalid. Try another name."});
+      return callback({message:"Name is taken or invalid. Try another name."});
     } else {
           const {username, userRoom} = users.get(client.id);
       users.set(client.id, {username: name, userRoom});
@@ -158,8 +153,10 @@ io.on("connection", client => {
   })
 
   client.on("message", (content, callback) => {
+    if(content.length < 1){
+      return callback(null);
+    }
     const {username, userRoom} = users.get(client.id);
-
     console.log(`Received ${content} from ${username} to ${userRoom}`);
     client.to(userRoom).emit("message", {username, content});
     callback({username, content});
@@ -185,7 +182,14 @@ server.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
 });
 
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("client/build"));
 
+  const path = require("path");
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
+}
 
 
 
