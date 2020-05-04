@@ -38,6 +38,7 @@ export default props => {
     if(roomName.length > 27) {
       return alert("Maximum name length is 27 characters");
     }
+    if(roomName.length < 1 || !roomName.replace(/\s/g, '').length) return;
     // console.log('creating:', roomName);
     createRoom(roomName);
     chatroomCreateRef.current.value = "";

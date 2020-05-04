@@ -9,7 +9,6 @@ const App = props => {
   const [ username, setUsername ] = useState(null);
   const [ isEditingUsername, setIsEditing ] = useState(false);
   const [ chatroomName, setChatroomName] = useState('');
-  // const [ usernameInHeader, setUsernameInHeader] = useState(false);
   const usernameEditRef = useRef();
 
   const { client } = props;

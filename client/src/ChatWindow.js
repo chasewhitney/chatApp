@@ -12,7 +12,7 @@ export default props => {
   // const devLog = [{user:"STARTER", content:"TOPMOST ITEM"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:null, content: "This is a server message"},{user:null, content: "This is a server message"},{user:null, content: "This is a server message"},{user:"BOTTOM", content:"BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM "}];
 
   useEffect(() => {
-    addEntry({username:null, content:`You joined ${chatroomName}`});
+    addEntry({username:null, content:`You joined ${chatroomName}.`});
     client.listenForMessages(addEntry);
     setUsernameSet(true);
 
@@ -21,13 +21,13 @@ export default props => {
 
   useEffect(() =>{
     if(usernameSet) {
-      addEntry({username: null, content: `Changed name to ${username}`});
+      addEntry({username: null, content: `Changed name to ${username}.`});
     }
   }, [username]);
 
   useEffect(() => {
     setChatLog([]);
-    addEntry({username:null, content:`You joined ${chatroomName}`});
+    addEntry({username:null, content:`You joined ${chatroomName}.`});
   },[chatroomName]);
 
   useEffect(() => {
@@ -63,8 +63,6 @@ export default props => {
   }
 
   const renderChatLog = () => {
-    // console.log('RENDERING CHATLOG with:', chatLog);
-
     let keyCounter = 1;
 
     return (
@@ -76,7 +74,6 @@ export default props => {
     )
   }
 
-  // console.log("Rending ChatWindow");
   return (
     <>
       <div className="chatWindow__chatLog">

@@ -5,7 +5,6 @@ const io = require("socket.io")(server);
 
 const PORT = process.env.PORT || 5001;
 
-
 const users = new Map();
 const rooms = new Map();
 
@@ -95,9 +94,10 @@ io.on("connection", client => {
 
 
   const userCreateRoom = (room, callback) => {
-    if(room.length > 27 || roomExists(room)) {
+    if(room.length > 27 || rooms.length < 1 || roomExists(room) || !room.replace(/\s/g, '').length) {
       return callback(null);
     }
+
 
     const {username, userRoom} = users.get(client.id);
     userLeaveRoom();
@@ -144,7 +144,7 @@ io.on("connection", client => {
           const {username, userRoom} = users.get(client.id);
       users.set(client.id, {username: name, userRoom});
       if(userRoom) {
-        const content = `${username} changed name to ${name}`;
+        const content = `${username} changed name to ${name}.`;
         client.to(userRoom).emit("message", {user:null, content});
         rooms.get(userRoom).set(client.id, name);
         emitUserList(userRoom);
@@ -182,7 +182,6 @@ io.on("connection", client => {
     users.delete(client.id);
   })
 
-
   // client.on("checkVars", (_, callback) => {
   //   console.log('users:', users );
   //   console.log('rooms:', rooms );
@@ -192,4 +191,17 @@ io.on("connection", client => {
 
 server.listen(PORT, () => {
   console.log("Listening on port", PORT);
-})
+});
+
+// TODO: Consistent punctuation in server messages, consider wording changes
+// TODO: Refactors/DRY
+
+// STRETCH
+// User status with colors
+// Connect to multiple rooms
+// Chatroom list: See which users in rooms
+// Chatroom list: User count
+
+// SUPERSTRETCH
+// Screen sharing
+// Voice comms
