@@ -26,7 +26,7 @@ io.on("connection", client => {
 
   const nameExists = name => {
     for(let [k, v] of users){
-      if(v.name && v.name.toLowerCase() === name.toLowerCase()){
+      if(v.username && v.username.toLowerCase() === name.toLowerCase()){
         return true;
       }
     }
@@ -139,9 +139,10 @@ io.on("connection", client => {
 
   client.on("changeUsername", (name, callback ) => {
     if(!name || nameExists(name) || name.length > 22) {
+      console.log('invalid name');
       return callback({message:"Name is taken or invalid. Try another name."});
     } else {
-          const {username, userRoom} = users.get(client.id);
+      const {username, userRoom} = users.get(client.id);
       users.set(client.id, {username: name, userRoom});
       if(userRoom) {
         const content = `${username} changed name to ${name}.`;
@@ -193,7 +194,6 @@ server.listen(PORT, () => {
   console.log("Listening on port", PORT);
 });
 
-// TODO: Consistent punctuation in server messages, consider wording changes
 // TODO: Refactors/DRY
 
 // STRETCH

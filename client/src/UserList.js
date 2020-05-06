@@ -25,7 +25,7 @@ export default props => {
 
   const renderUserList = () => {
     return (
-      <>{users.map(user => <div className="userList__item" key={user}>{user}</div>)}</>
+      <>{users.sort().map(user => <div className="userList__item" key={user}>{user}</div>)}</>
     )
   }
 

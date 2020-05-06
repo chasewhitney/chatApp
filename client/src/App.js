@@ -8,7 +8,7 @@ import Chatroom from "./Chatroom";
 const App = props => {
   const [ username, setUsername ] = useState(null);
   const [ isEditingUsername, setIsEditing ] = useState(false);
-  const [ chatroomName, setChatroomName] = useState('');
+  const [ chatroomName, setChatroomName] = useState(null);
   const usernameEditRef = useRef();
 
   const { client } = props;
@@ -30,7 +30,6 @@ const App = props => {
       console.log('Room set to:', res);
       setChatroomName(res);
     }
-
   }
 
   const handleLeave = e => {
@@ -41,8 +40,8 @@ const App = props => {
   }
 
   const handleJoinRoom = room => {
-    if(room.toLowerCase() === chatroomName.toLowerCase()){
-      alert("You are already in that room.");
+    if(chatroomName && room && room.toLowerCase() === chatroomName.toLowerCase()){
+      alert("Cannot join that room.");
     }
     client.joinRoom(room, handleRoomChangeResponse);
   }

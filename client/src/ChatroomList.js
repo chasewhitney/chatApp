@@ -67,7 +67,7 @@ export default props => {
             <div className="chatroomsNav__createChatroom">
               <div>(Click to join)</div>
               <div>or</div>
-              <form className="createChatroom__form"><input className="createChatroom__textInput" type="text" ref={chatroomCreateRef}/ ><button className="createChatroom__submit" onClick={handleCreateSubmit}>CREATE</button></form>
+              <form className="createChatroom__form"><input className="createChatroom__textInput" type="text" ref={chatroomCreateRef}/ ><button className="createChatroom__submit" onClick={handleCreateSubmit}><span>Create</span></button></form>
             </div>
           </div>
   )
