@@ -3,26 +3,22 @@ import React, {useState, useEffect, useRef} from "react";
 export default props => {
   const [chatroomList, setChatroomList] = useState([]);
   const chatroomCreateRef = useRef();
-  let chatroomToJoin = '';
 
+  let chatroomToJoin = '';
   const {client, joinRoom, createRoom, currentRoom} = props;
 
   useEffect(() => {
-    console.log('ChatroomListMounted');
     client.getRooms(handleGetResponse);
     client.listenForChatrooms(handleListUpdate);
 
     return () => client.stopListeningRooms();
-    //DEV
-    // setChatroomList(["RoomOne", "Two", "Three","RoomOne", "Two", "Three","RoomOne", "Two", "Three","RoomOne", "Two", "Three","RoomOne", "Two", "Three","RoomOne", "Two", "Three", "Two", "Three","RoomOne", "Two", "Three","RoomOne", "Two", "Three","RoomOne", "Two", "Three","RoomOne"]);
   }, []);
 
   const handleGetResponse = res => {
-    console.log('getChatroomsResponse:', res);
     setChatroomList(res);
   }
+
   const handleListUpdate = chatroomList => {
-    console.log('got new chatroomList');
     setChatroomList(chatroomList);
   }
 
@@ -44,10 +40,6 @@ export default props => {
     chatroomCreateRef.current.value = "";
   }
 
-  const testFunc = () => {
-    console.log('in testFunc');
-  }
-
   const renderChatrooms = () => {
     if(chatroomList.length > 0)
     {
@@ -57,7 +49,6 @@ export default props => {
     }
   }
 
-  // console.log('rendering ChatroomList');
   return (
           <div className="chatroomsNav">
             <div className="chatroomsNav__chatroomsList">

@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./App.css";
-
 import ChatroomList from "./ChatroomList";
 import Chatroom from "./Chatroom";
-
+import "./App.css";
 
 const App = props => {
   const [ username, setUsername ] = useState(null);
@@ -14,7 +12,6 @@ const App = props => {
   const { client } = props;
 
   useEffect(() => {
-    console.log("APP MOUNT");
     client.registerUser(handleUsernameResponse);
   },[])
 
@@ -77,7 +74,6 @@ const App = props => {
       console.log("Couldn't update username:", res.message);
       alert(res.message)
     } else {
-      console.log('Username set to:', res);
       setUsername(res);
     }
   }
@@ -101,10 +97,6 @@ const App = props => {
     } else {
       return <div onClick={() => setIsEditing(true)} className="header__username__name">{username}</div>
     }
-  }
-
-  const myTestFunc = () => {
-    client.checkVars();
   }
 
   return (

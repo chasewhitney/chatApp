@@ -6,7 +6,6 @@ export default () => {
       ? window.location.hostname
       : "http://localhost:5001";
 
-
   const socket = io(endpoint, {secure: true});
 
   socket.on("tempError", err => {
@@ -15,7 +14,6 @@ export default () => {
   })
 
   // EMITTERS
-
   const registerUser = callback => {
     socket.emit("registerUser", null, callback);
   }
@@ -50,46 +48,31 @@ export default () => {
 
   // LISTENERS
   const listenForChatrooms = callback => {
-    console.log('Listening for chatrooms');
     socket.on('rooms', callback);
   }
 
   const listenForMessages = callback => {
-    console.log('Listening for messages');
     socket.on('message', callback);
   }
 
   const listenForUserListUpdate = callback => {
-    console.log("Listening for userList");
     socket.on("userList", callback);
   }
 
   // REMOVE LISTENERS
   const stopListeningRooms = () => {
-    console.log('Stopped listening for chatrooms');
     socket.removeAllListeners('rooms');
   }
 
   const stopListeningMessages = () => {
-    console.log('Stopped listening for messages');
     socket.removeAllListeners('message');
   }
 
   const stopListeningUserList = () => {
-    console.log('Stopped listening for userList');
     socket.removeAllListeners('userList');
   }
 
-  // const listenForChatroomName = callback => {
-  //   socket.on("roomName", callback);
-  // }
-
-  // DEV
-  const checkVars = () => {
-    socket.emit("checkVars");
-  }
-  // END DEV
   return {
-    registerUser, getRooms, getUserList, changeUsername, sendMessage, joinRoom, leaveRoom, createRoom, listenForChatrooms, listenForMessages, listenForUserListUpdate, stopListeningRooms, stopListeningMessages, stopListeningUserList, checkVars
+    registerUser, getRooms, getUserList, changeUsername, sendMessage, joinRoom, leaveRoom, createRoom, listenForChatrooms, listenForMessages, listenForUserListUpdate, stopListeningRooms, stopListeningMessages, stopListeningUserList
   }
 }

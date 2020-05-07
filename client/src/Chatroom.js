@@ -1,14 +1,9 @@
 import React, {useEffect} from "react";
-
 import ChatWindow from "./ChatWindow";
 import UserList from "./UserList";
 
 export default props => {
   const {client, chatroomName, handleLeaveClick, username} = props;
-
-  useEffect(()=>{
-    console.log('Chatroom Component rendered');
-  })
 
   if(chatroomName) {
     return (

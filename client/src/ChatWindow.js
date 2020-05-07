@@ -4,12 +4,9 @@ export default props => {
   const [usernameSet, setUsernameSet] = useState(false);
   const [chatLog, setChatLog] = useState([]);
   const chatInputRef = useRef();
-  const {client, chatroomName, username} = props;
   let messagesEnd = useRef();
 
-
-  //DEV
-  // const devLog = [{user:"STARTER", content:"TOPMOST ITEM"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:"Bot", content:"Ima bot"},{user:null, content: "This is a server message"},{user:null, content: "This is a server message"},{user:null, content: "This is a server message"},{user:null, content: "This is a server message"},{user:"BOTTOM", content:"BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM BOTTOMMOST ITEM "}];
+  const {client, chatroomName, username} = props;
 
   useEffect(() => {
     addEntry({username:null, content:`You joined ${chatroomName}.`});
@@ -35,12 +32,10 @@ export default props => {
   })
 
   const addEntry = message => {
-    console.log('got a message:', message);
     setChatLog((prevLog) => prevLog.concat(message));
   }
 
   const scrollToBottom = () => {
-    console.log();
     messagesEnd.scrollIntoView({ behavior: "smooth" });
   }
 
@@ -56,7 +51,6 @@ export default props => {
   }
 
   const handleChatResponse = res => {
-    console.log('handleChatResponse:', res);
     if(res) {
       addEntry(res);
     }
@@ -67,8 +61,8 @@ export default props => {
 
     return (
       <>{ chatLog.map( message => {
-        if(message.username) return <div key={keyCounter++} className="chatLog__message"><span className="chatLog__message-sender">{ message.username }:</span><span className="chatLog__message-content">{ message.content }</span></div>
-        else return <div className="chatLog__serverMessage" key={keyCounter++}>{ message.content }</div>
+          if(message.username) return <div key={keyCounter++} className="chatLog__message"><span className="chatLog__message-sender">{ message.username }:</span><span className="chatLog__message-content">{ message.content }</span></div>
+          else return <div className="chatLog__serverMessage" key={keyCounter++}>{ message.content }</div>
         })}
       </>
     )
@@ -80,7 +74,6 @@ export default props => {
         {renderChatLog()}
         <div ref={el => messagesEnd = el} />
       </div>
-
       <form>
         <input className="chatWindow__inputBar" type="text" ref={chatInputRef} /><button hidden={true} type="submit" onClick={handleChatSubmit}>Send</button>
       </form>

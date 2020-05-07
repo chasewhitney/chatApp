@@ -29,10 +29,10 @@ export default props => {
     )
   }
 
-return (
-    <div className="chatroom__userList">
-      <div className="userList__header">Online{users.length ? " - " + users.length : null}</div>
-      <div className="userList__content">{renderUserList()}</div>
-    </div>
-  )
+  return (
+      <div className="chatroom__userList">
+        <div className="userList__header">Online{users.length ? " - " + users.length : null}</div>
+        <div className="userList__content">{renderUserList()}</div>
+      </div>
+    )
 }

@@ -8,7 +8,6 @@ const PORT = process.env.PORT || 5001;
 const users = new Map();
 const rooms = new Map();
 
-
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"));
 
@@ -19,11 +18,9 @@ if (process.env.NODE_ENV === "production") {
 }
 
 io.on("connection", client => {
-  // console.log("User connected:", client.id);
   users.set(client.id, {username: null, userRoom: null});
 
   //// HELPERS /////////////////
-
   const nameExists = name => {
     for(let [k, v] of users){
       if(v.username && v.username.toLowerCase() === name.toLowerCase()){
@@ -39,20 +36,18 @@ io.on("connection", client => {
   }
 
   const emitUserList = room => {
-    // console.log('emitting userlist to room:', room);
     const userList = Array.from(rooms.get(room).values());
-    // console.log('emitting userList:', userList);
     io.to(room).emit("userList", userList);
   }
 
   const emitRooms = () => {
     const roomsList = Array.from(rooms.keys());
-    // console.log('emitting rooms with:', roomsList);
     io.emit("rooms", roomsList);
   }
 
   const userLeaveRoom = (_, callback) => {
     const {username, userRoom} = users.get(client.id);
+
     if(userRoom) {
       const content = `${username} left the room.`;
       client.to(userRoom).emit("message", {user: null, content});
@@ -81,7 +76,6 @@ io.on("connection", client => {
     const room = rooms.get(roomName);
     room.set(client.id, username);
     users.set(client.id, {username, userRoom: roomName});
-    // console.log('joining room..');
     client.join(roomName, () => {
       const content = `${username} joined the room.`;
       client.to(roomName).emit("message", {user: null, content});
@@ -90,14 +84,10 @@ io.on("connection", client => {
     });
   }
 
-
-
-
   const userCreateRoom = (room, callback) => {
     if(room.length > 27 || rooms.length < 1 || roomExists(room) || !room.replace(/\s/g, '').length) {
       return callback(null);
     }
-
 
     const {username, userRoom} = users.get(client.id);
     userLeaveRoom();
@@ -106,14 +96,13 @@ io.on("connection", client => {
     users.set(client.id, {username, userRoom: room});
 
     client.join(room, () => {
-      // console.log('in createroom with, about to send rooms..');
       emitRooms();
+      emitUserList(room);
       callback(room);
     });
   }
 
   //// LISTENERS ///////////////////////
-
   client.on("registerUser", ( _,callback) => {
     let newName = "GUEST-" + Math.ceil( Math.random() * 9999 );
 
@@ -124,7 +113,6 @@ io.on("connection", client => {
     users.set(client.id, {username: newName, userRoom: null});
     callback(newName);
   })
-
 
   client.on("getRooms", (_, callback) => {
     const roomsArr = Array.from(rooms.keys());
@@ -150,7 +138,6 @@ io.on("connection", client => {
         rooms.get(userRoom).set(client.id, name);
         emitUserList(userRoom);
       }
-
       callback(name);
     }
   })
@@ -170,38 +157,17 @@ io.on("connection", client => {
       return callback(null);
     }
     const {username, userRoom} = users.get(client.id);
-    // console.log(`Received ${content} from ${username} to ${userRoom}`);
     client.to(userRoom).emit("message", {username, content});
     callback({username, content});
   })
 
   client.on("disconnect", () => {
-    // console.log("User disconnected:", client.id)
-    // console.log("was in room:", client.currentChatroom)
-
     userLeaveRoom();
     users.delete(client.id);
   })
-
-  // client.on("checkVars", (_, callback) => {
-  //   console.log('users:', users );
-  //   console.log('rooms:', rooms );
-  // })
 
 });
 
 server.listen(PORT, () => {
   console.log("Listening on port", PORT);
 });
-
-// TODO: Refactors/DRY
-
-// STRETCH
-// User status with colors
-// Connect to multiple rooms
-// Chatroom list: See which users in rooms
-// Chatroom list: User count
-
-// SUPERSTRETCH
-// Screen sharing
-// Voice comms
